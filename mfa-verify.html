@@ -205,6 +205,26 @@
                 console.log('📋 Método solicitado:', mfaMethod);
                 console.log('📋 URL de retorno:', returnUrl);
 
+                // Restaurar credencial desde la base de datos si existe
+                try {
+                    const { data: { user } } = await window.supabaseClient.auth.getUser();
+                    if (user) {
+                        const { data: prefData } = await window.supabaseClient
+                            .from('user_mfa_preferences')
+                            .select('biometric_credential_id')
+                            .eq('user_id', user.id)
+                            .single();
+                        if (prefData && prefData.biometric_credential_id) {
+                            localStorage.setItem('biometric_credential', JSON.stringify({
+                                id: prefData.biometric_credential_id,
+                                rawId: prefData.biometric_credential_id
+                            }));
+                        }
+                    }
+                } catch (dbErr) {
+                    console.warn('No se pudo restaurar la credencial desde la base de datos:', dbErr);
+                }
+
                 const { data: factors, error: factorsError } = await window.supabaseClient.auth.mfa.listFactors();
                 if (factorsError) throw factorsError;
                 
