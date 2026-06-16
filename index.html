@@ -270,6 +270,13 @@
                     return;
                 }
 
+                // Fallback: si el usuario ya verificó por TOTP (AAL2) y tiene TOTP activo,
+                // permitirle continuar para evitar bucles si la biometría no está disponible en este dispositivo.
+                if (hasTOTP && isTotpVerified) {
+                    console.log('✅ Acceso permitido mediante fallback de TOTP (AAL2)');
+                    return;
+                }
+
                 // Determinar qué método falta por verificar
                 let metodo = 'totp';
                 
