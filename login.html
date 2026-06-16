@@ -548,13 +548,32 @@
         // PROCESAR LOGIN CON MFA
         // ============================================
         async function processLoginWithMFA(user, preferences) {
-            let hasTOTP = preferences?.totp_enabled === true;
+            let hasTOTP = false;
+            try {
+                const { data: factors } = await window.supabaseClient.auth.mfa.listFactors();
+                const totpFactor = factors && factors.totp && factors.totp.find(f => f.status === 'verified');
+                if (totpFactor) {
+                    mfaFactorId = totpFactor.id;
+                    hasTOTP = true;
+                    console.log('📱 Factor TOTP verificado encontrado en Supabase:', mfaFactorId);
+                }
+            } catch (error) {
+                console.error('Error obteniendo factores de autenticación:', error);
+            }
+
             const hasBiometric = preferences?.biometric_enabled === true;
-            const mode = preferences?.mode || 'totp';
+            let mode = preferences?.mode || 'totp';
+
+            // Normalizar modo si hay discrepancia
+            if (hasBiometric && !hasTOTP) {
+                mode = 'biometric';
+            } else if (hasTOTP && !hasBiometric) {
+                mode = 'totp';
+            }
 
             console.log('🔐 ===== PROCESANDO LOGIN MFA =====');
-            console.log('📱 TOTP activado:', hasTOTP);
-            console.log('🖐️ Biometría activada:', hasBiometric);
+            console.log('📱 TOTP activado (Auth):', hasTOTP);
+            console.log('🖐️ Biometría activada (Prefs):', hasBiometric);
             console.log('⚙️ Modo seleccionado:', mode);
             console.log('📧 Usuario:', user.email);
 
@@ -565,23 +584,6 @@
             }
 
             pendingUserData = user;
-
-            if (hasTOTP) {
-                try {
-                    const { data: factors } = await window.supabaseClient.auth.mfa.listFactors();
-                    const totpFactor = factors.totp.find(f => f.status === 'verified');
-                    if (totpFactor) {
-                        mfaFactorId = totpFactor.id;
-                        console.log('📱 Factor TOTP encontrado:', mfaFactorId);
-                    } else {
-                        console.warn('⚠️ TOTP activado pero no se encontró factor verificado');
-                        hasTOTP = false;
-                    }
-                } catch (error) {
-                    console.error('Error obteniendo factor TOTP:', error);
-                    hasTOTP = false;
-                }
-            }
 
             // ==========================================
             // LÓGICA CORREGIDA

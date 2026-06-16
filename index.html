@@ -219,25 +219,32 @@
         // ============================================
         async function verificarMFA(user) {
             try {
+                // Obtener factores reales de Supabase Auth (fuente de verdad)
+                const { data: factorsData, error: factorsError } = await window.supabaseClient.auth.mfa.listFactors();
+                if (factorsError) throw factorsError;
+                
+                const hasTOTP = factorsData && factorsData.totp && factorsData.totp.some(f => f.status === 'verified');
+
+                // Obtener preferencias guardadas para biometría y modo
                 const { data: prefs, error: prefsError } = await window.supabaseClient
                     .from('user_mfa_preferences')
                     .select('*')
                     .eq('user_id', user.id)
                     .single();
 
-                if (prefsError || !prefs) {
-                    console.log('📋 Sin preferencias MFA, continuar');
-                    return;
+                // Si no hay preferencias en BD, pero tiene TOTP en Auth, asumimos TOTP activo
+                let hasBiometric = false;
+                let mode = 'totp';
+
+                if (prefs) {
+                    hasBiometric = prefs.biometric_enabled === true;
+                    mode = prefs.mode || 'totp';
                 }
 
-                const hasTOTP = prefs.totp_enabled === true;
-                const hasBiometric = prefs.biometric_enabled === true;
-                let mode = prefs.mode || 'totp';
-
                 console.log('🔐 Verificando MFA para usuario:', user.email);
-                console.log('📱 TOTP activado:', hasTOTP);
-                console.log('🖐️ Biometría activada:', hasBiometric);
-                console.log('⚙️ Modo:', mode);
+                console.log('📱 TOTP activado (Auth):', hasTOTP);
+                console.log('🖐️ Biometría activada (Prefs):', hasBiometric);
+                console.log('⚙️ Modo preferido:', mode);
 
                 if (!hasTOTP && !hasBiometric) {
                     console.log('✅ Sin MFA activado, continuar');
