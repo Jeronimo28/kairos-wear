@@ -458,6 +458,15 @@
                 }
 
                 console.log('📋 Preferencias encontradas:', data);
+
+                // Restaurar la credencial en localStorage desde la base de datos
+                if (data.biometric_credential_id) {
+                    localStorage.setItem('biometric_credential', JSON.stringify({
+                        id: data.biometric_credential_id,
+                        rawId: data.biometric_credential_id
+                    }));
+                }
+
                 return {
                     totp_enabled: data.totp_enabled === true,
                     biometric_enabled: data.biometric_enabled === true,
