@@ -10,7 +10,7 @@ window.loginWithGoogle = async function() {
     const { data, error } = await window.supabaseClient.auth.signInWithOAuth({
         provider: 'google',
         options: {
-            redirectTo: window.location.origin + '/index.html',
+            redirectTo: 'https://jeronimo28.github.io/kairos-wear/index.html',
             queryParams: {
                 prompt: 'select_account'
             }
