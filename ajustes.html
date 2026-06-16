@@ -295,6 +295,219 @@
             color: #666;
             margin-top: 0.5rem;
         }
+        
+        /* === NUEVOS ESTILOS SEGURIDAD PREMIUM === */
+        .mfa-cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .mfa-card {
+            background: #222222;
+            border: 1px solid #333333;
+            border-radius: 12px;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .mfa-card:hover {
+            border-color: #b87c4f;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(184, 124, 79, 0.1);
+        }
+        .mfa-card.active {
+            border-color: rgba(76, 175, 80, 0.4);
+            background: linear-gradient(180deg, #222222 0%, #1c261e 100%);
+        }
+        .mfa-card.active:hover {
+            border-color: #4caf50;
+            box-shadow: 0 4px 20px rgba(76, 175, 80, 0.15);
+        }
+        .mfa-card-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        .mfa-card-icon {
+            font-size: 2rem;
+            width: 50px;
+            height: 50px;
+            background: #2e2e2e;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #3e3e3e;
+            transition: all 0.3s ease;
+        }
+        .mfa-card.active .mfa-card-icon {
+            background: rgba(76, 175, 80, 0.1);
+            border-color: rgba(76, 175, 80, 0.3);
+            color: #4caf50;
+        }
+        .mfa-card-title-block {
+            display: flex;
+            flex-direction: column;
+            text-align: left;
+        }
+        .mfa-card-title {
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: #e5e5e5;
+        }
+        .mfa-card-subtitle {
+            font-size: 0.75rem;
+            color: #888;
+            margin-top: 2px;
+        }
+        .mfa-card-body {
+            font-size: 0.85rem;
+            color: #b0b0b0;
+            line-height: 1.4;
+            margin-bottom: 1.5rem;
+            text-align: left;
+            flex-grow: 1;
+        }
+        .mfa-card-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            margin-top: auto;
+        }
+        .status-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.3rem 0.6rem;
+            border-radius: 20px;
+        }
+        .status-badge.active {
+            background: rgba(76, 175, 80, 0.15);
+            color: #4caf50;
+        }
+        .status-badge.inactive {
+            background: rgba(255, 255, 255, 0.05);
+            color: #888;
+        }
+        .pulsating-dot {
+            width: 6px;
+            height: 6px;
+            background: #4caf50;
+            border-radius: 50%;
+            box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.7);
+            animation: pulsate 1.5s infinite;
+        }
+        @keyframes pulsate {
+            0% {
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.7);
+            }
+            70% {
+                transform: scale(1);
+                box-shadow: 0 0 0 6px rgba(76, 175, 80, 0);
+            }
+            100% {
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(76, 175, 80, 0);
+            }
+        }
+        .btn-mfa-action {
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+        }
+        .btn-mfa-action.setup {
+            background: transparent;
+            border-color: #b87c4f;
+            color: #b87c4f;
+        }
+        .btn-mfa-action.setup:hover {
+            background: #b87c4f;
+            color: #0a0a0a;
+        }
+        .btn-mfa-action.deactivate {
+            background: rgba(255, 107, 107, 0.1);
+            border-color: rgba(255, 107, 107, 0.3);
+            color: #ff6b6b;
+        }
+        .btn-mfa-action.deactivate:hover {
+            background: #ff6b6b;
+            color: #0a0a0a;
+            border-color: #ff6b6b;
+        }
+        .mfa-selector-section {
+            background: #222222;
+            border: 1px solid #333333;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+            text-align: left;
+        }
+        .mfa-selector-header {
+            margin-bottom: 1rem;
+        }
+        .mfa-selector-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #e5e5e5;
+            display: block;
+        }
+        .mfa-selector-desc {
+            font-size: 0.8rem;
+            color: #888;
+            margin-top: 4px;
+        }
+        .segmented-control {
+            display: flex;
+            background: #121212;
+            border-radius: 8px;
+            padding: 4px;
+            border: 1px solid #2a2a2a;
+            margin-top: 1rem;
+            position: relative;
+            gap: 4px;
+        }
+        .segmented-control input[type="radio"] {
+            display: none;
+        }
+        .segmented-control label {
+            flex: 1;
+            text-align: center;
+            padding: 0.8rem 1rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #888;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        .segmented-control input[type="radio"]:checked + label {
+            background: #b87c4f;
+            color: #0a0a0a;
+        }
+        .segmented-control input[type="radio"]:disabled + label {
+            opacity: 0.3;
+            cursor: not-allowed;
+            color: #444;
+        }
     </style>
 </head>
 <body>
@@ -347,49 +560,60 @@
                 <h2>🔐 Métodos de autenticación</h2>
                 <p class="section-desc">Elige cómo quieres verificar tu identidad al iniciar sesión o realizar cambios sensibles.</p>
                 
-                <!-- Opción 1: Código 6 dígitos (TOTP) -->
-                <div class="info-row">
-                    <div>
-                        <span class="info-label">📱 Código de 6 dígitos</span>
-                        <br>
-                        <span class="info-sub">Google Authenticator, Authy, etc.</span>
+                <div class="mfa-cards-container">
+                    <!-- Tarjeta TOTP -->
+                    <div class="mfa-card" id="totpCard">
+                        <div>
+                            <div class="mfa-card-header">
+                                <div class="mfa-card-icon">📱</div>
+                                <div class="mfa-card-title-block">
+                                    <span class="mfa-card-title">Código de 6 dígitos</span>
+                                    <span class="mfa-card-subtitle">Google Authenticator, Authy</span>
+                                </div>
+                            </div>
+                            <p class="mfa-card-body">Genera códigos de acceso de un solo uso que cambian cada 30 segundos en tu teléfono móvil para una capa extra de protección.</p>
+                        </div>
+                        <div class="mfa-card-footer">
+                            <span id="totpStatusBadge" class="status-badge inactive">❌ Inactivo</span>
+                            <button class="btn-mfa-action setup" id="totpSetupBtn">Configurar</button>
+                        </div>
                     </div>
-                    <div class="mfa-status">
-                        <span id="totpStatus" class="mfa-badge inactive">❌ Inactivo</span>
-                        <button class="btn-settings" id="totpSetupBtn">Configurar</button>
+                    
+                    <!-- Tarjeta Biometría -->
+                    <div class="mfa-card" id="biometricCard">
+                        <div>
+                            <div class="mfa-card-header">
+                                <div class="mfa-card-icon">🖐️</div>
+                                <div class="mfa-card-title-block">
+                                    <span class="mfa-card-title">Autenticación biométrica</span>
+                                    <span class="mfa-card-subtitle">Face ID, Touch ID, Windows Hello</span>
+                                </div>
+                            </div>
+                            <p class="mfa-card-body">Usa tu rostro o huella dactilar para verificar tu identidad de forma ultra-rápida y segura sin tener que escribir códigos.</p>
+                        </div>
+                        <div class="mfa-card-footer">
+                            <span id="biometricStatusBadge" class="status-badge inactive">❌ Inactivo</span>
+                            <button class="btn-mfa-action setup" id="biometricSetupBtn">Configurar</button>
+                        </div>
                     </div>
                 </div>
                 
-                <!-- Opción 2: Biométrica -->
-                <div class="info-row">
-                    <div>
-                        <span class="info-label">🖐️ Autenticación biométrica</span>
-                        <br>
-                        <span class="info-sub">Huella dactilar, Face ID, Windows Hello</span>
+                <!-- Modo de verificación (Segmented Control) -->
+                <div class="mfa-selector-section">
+                    <div class="mfa-selector-header">
+                        <span class="mfa-selector-title">⚙️ Modo de verificación de inicio de sesión</span>
+                        <p class="mfa-selector-desc">¿Qué método prefieres que se te solicite de forma predeterminada?</p>
                     </div>
-                    <div class="mfa-status">
-                        <span id="biometricStatus" class="mfa-badge inactive">❌ Inactivo</span>
-                        <button class="btn-settings" id="biometricSetupBtn">Configurar</button>
-                    </div>
-                </div>
-                
-                <!-- Modo de verificación -->
-                <div class="info-row" style="border-bottom: none; padding-top: 1rem;">
-                    <div>
-                        <span class="info-label">⚙️ Modo de verificación</span>
-                        <br>
-                        <span class="info-sub">¿Qué método quieres usar al iniciar sesión?</span>
-                    </div>
-                    <div class="mfa-radio-group">
-                        <label>
-                            <input type="radio" name="mfaMode" value="totp"> Solo código 6 dígitos
-                        </label>
-                        <label>
-                            <input type="radio" name="mfaMode" value="biometric"> Solo biométrica
-                        </label>
-                        <label>
-                            <input type="radio" name="mfaMode" value="both"> Ambos (máxima seguridad)
-                        </label>
+                    
+                    <div class="segmented-control">
+                        <input type="radio" name="mfaMode" id="mfaModeTotp" value="totp">
+                        <label for="mfaModeTotp">📱 Código 6 dígitos</label>
+                        
+                        <input type="radio" name="mfaMode" id="mfaModeBiometric" value="biometric">
+                        <label for="mfaModeBiometric">🖐️ Face ID / Touch ID</label>
+                        
+                        <input type="radio" name="mfaMode" id="mfaModeBoth" value="both">
+                        <label for="mfaModeBoth">🔐 Ambos métodos</label>
                     </div>
                 </div>
             </div>
@@ -653,34 +877,58 @@
         // ACTUALIZAR UI
         // ============================================
         function updateUIForMFAPreferences() {
-            // Badge TOTP
-            const totpBadge = document.getElementById('totpStatus');
-            if (totpBadge) {
+            const totpCard = document.getElementById('totpCard');
+            const totpBadge = document.getElementById('totpStatusBadge');
+            const totpBtn = document.getElementById('totpSetupBtn');
+            
+            if (totpCard && totpBadge && totpBtn) {
                 if (userMFAPreferences.totpEnabled) {
-                    totpBadge.textContent = '✅ Activo';
-                    totpBadge.className = 'mfa-badge active';
+                    totpCard.classList.add('active');
+                    totpBadge.innerHTML = '<span class="pulsating-dot"></span> Activo';
+                    totpBadge.className = 'status-badge active';
+                    totpBtn.textContent = 'Desactivar';
+                    totpBtn.className = 'btn-mfa-action deactivate';
                 } else {
+                    totpCard.classList.remove('active');
                     totpBadge.textContent = '❌ Inactivo';
-                    totpBadge.className = 'mfa-badge inactive';
+                    totpBadge.className = 'status-badge inactive';
+                    totpBtn.textContent = 'Configurar';
+                    totpBtn.className = 'btn-mfa-action setup';
                 }
             }
             
-            // Badge Biometría
-            const bioBadge = document.getElementById('biometricStatus');
-            if (bioBadge) {
+            const bioCard = document.getElementById('biometricCard');
+            const bioBadge = document.getElementById('biometricStatusBadge');
+            const bioBtn = document.getElementById('biometricSetupBtn');
+            
+            if (bioCard && bioBadge && bioBtn) {
                 if (userMFAPreferences.biometricEnabled) {
-                    bioBadge.textContent = '✅ Activo';
-                    bioBadge.className = 'mfa-badge active';
+                    bioCard.classList.add('active');
+                    bioBadge.innerHTML = '<span class="pulsating-dot"></span> Activo';
+                    bioBadge.className = 'status-badge active';
+                    bioBtn.textContent = 'Desactivar';
+                    bioBtn.className = 'btn-mfa-action deactivate';
                 } else {
+                    bioCard.classList.remove('active');
                     bioBadge.textContent = '❌ Inactivo';
-                    bioBadge.className = 'mfa-badge inactive';
+                    bioBadge.className = 'status-badge inactive';
+                    bioBtn.textContent = 'Configurar';
+                    bioBtn.className = 'btn-mfa-action setup';
                 }
             }
             
-            // Radio buttons
+            // Radio buttons (Segmented Control)
             document.querySelectorAll('input[name="mfaMode"]').forEach(radio => {
                 radio.checked = radio.value === userMFAPreferences.mode;
-                radio.disabled = !userMFAPreferences.totpEnabled && !userMFAPreferences.biometricEnabled;
+                
+                // Habilitar o deshabilitar según los factores disponibles
+                if (radio.value === 'totp') {
+                    radio.disabled = !userMFAPreferences.totpEnabled;
+                } else if (radio.value === 'biometric') {
+                    radio.disabled = !userMFAPreferences.biometricEnabled;
+                } else if (radio.value === 'both') {
+                    radio.disabled = !userMFAPreferences.totpEnabled || !userMFAPreferences.biometricEnabled;
+                }
             });
         }
         
@@ -1119,21 +1367,20 @@
             let isProcessing = false;
             
             try {
-                const { data, error } = await window.supabaseClient.auth.mfa.getAuthenticatorAssuranceLevel();
-                if (error) throw error;
+                // Obtener los factores reales para ver si ya tiene TOTP verificado
+                const { data: factorsData, error: factorsError } = await window.supabaseClient.auth.mfa.listFactors();
+                if (factorsError) throw factorsError;
                 
-                if (data && data.nextLevel === 'aal2') {
+                const totpFactors = factorsData.totp || [];
+                const verifiedTotp = totpFactors.find(f => f.status === 'verified');
+                
+                if (verifiedTotp) {
                     if (confirm('¿Desactivar el código de 6 dígitos?')) {
-                        const { data: factors } = await window.supabaseClient.auth.mfa.listFactors();
-                        const totpFactors = factors.totp || [];
-                        for (const factor of totpFactors) {
-                            if (factor.status === 'verified') {
-                                const { error: unenrollError } = await window.supabaseClient.auth.mfa.unenroll({ 
-                                    factorId: factor.id 
-                                });
-                                if (unenrollError) throw unenrollError;
-                            }
-                        }
+                        const { error: unenrollError } = await window.supabaseClient.auth.mfa.unenroll({ 
+                            factorId: verifiedTotp.id 
+                        });
+                        if (unenrollError) throw unenrollError;
+                        
                         userMFAPreferences.totpEnabled = false;
                         await saveMFAPreferences();
                         updateUIForMFAPreferences();
