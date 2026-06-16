@@ -828,6 +828,13 @@
                         mode: data.mode || 'totp'
                     };
                     
+                    // Normalizar modo preferido según los métodos activos
+                    if (userMFAPreferences.totpEnabled && !userMFAPreferences.biometricEnabled) {
+                        userMFAPreferences.mode = 'totp';
+                    } else if (!userMFAPreferences.totpEnabled && userMFAPreferences.biometricEnabled) {
+                        userMFAPreferences.mode = 'biometric';
+                    }
+                    
                     // Si tiene biometría guardada, actualizar localStorage
                     if (data.biometric_credential_id) {
                         localStorage.setItem('biometric_credential', JSON.stringify({
@@ -852,6 +859,13 @@
                 const savedCredential = JSON.parse(localStorage.getItem('biometric_credential') || 'null');
                 if (savedCredential) {
                     bioCredentialId = savedCredential.id;
+                }
+                
+                // Normalizar modo preferido según los métodos activos
+                if (userMFAPreferences.totpEnabled && !userMFAPreferences.biometricEnabled) {
+                    userMFAPreferences.mode = 'totp';
+                } else if (!userMFAPreferences.totpEnabled && userMFAPreferences.biometricEnabled) {
+                    userMFAPreferences.mode = 'biometric';
                 }
                 
                 const { error } = await window.supabaseClient

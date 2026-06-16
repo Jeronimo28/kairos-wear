@@ -232,7 +232,7 @@
 
                 const hasTOTP = prefs.totp_enabled === true;
                 const hasBiometric = prefs.biometric_enabled === true;
-                const mode = prefs.mode || 'totp';
+                let mode = prefs.mode || 'totp';
 
                 console.log('🔐 Verificando MFA para usuario:', user.email);
                 console.log('📱 TOTP activado:', hasTOTP);
@@ -242,6 +242,13 @@
                 if (!hasTOTP && !hasBiometric) {
                     console.log('✅ Sin MFA activado, continuar');
                     return;
+                }
+
+                // Normalizar modo si hay discrepancia entre lo que está activo y el modo preferido
+                if (hasBiometric && !hasTOTP) {
+                    mode = 'biometric';
+                } else if (hasTOTP && !hasBiometric) {
+                    mode = 'totp';
                 }
 
                 const { data: aalData } = await window.supabaseClient.auth.mfa.getAuthenticatorAssuranceLevel();
@@ -303,6 +310,10 @@
                 if (event === 'SIGNED_IN' && session) {
                     const user = session.user;
                     const userName = user.user_metadata?.name || user.email.split('@')[0];
+                    
+                    const localUser = JSON.parse(localStorage.getItem('kairosUser') || '{}');
+                    const wasLoggedIn = localUser && localUser.loggedIn;
+
                     localStorage.setItem('kairosUser', JSON.stringify({
                         id: user.id,
                         email: user.email,
@@ -311,7 +322,7 @@
                     }));
                     actualizarUIUsuario(userName);
                     
-                    if (!window.location.pathname.includes('mfa-verify.html')) {
+                    if (!wasLoggedIn && !window.location.pathname.includes('mfa-verify.html')) {
                         window.location.reload();
                     }
                 }
