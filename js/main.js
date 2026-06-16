@@ -137,19 +137,29 @@ function updateCartUI() {
     // Actualizar contenido del modal
     if (cartItems) {
         if (cart.length === 0) {
-            cartItems.innerHTML = '<p style="text-align: center; color: #888;">Tu carrito está vacío</p>';
+            cartItems.innerHTML = '<p style="text-align: center; color: #888; margin-top: 2rem;">Tu carrito está vacío</p>';
         } else {
             cartItems.innerHTML = cart.map(item => `
                 <div class="cart-item" data-id="${item.id}">
-                    <div class="cart-item-info">
+                    <div class="cart-item-img">
+                        <img src="${item.image}" alt="${item.name}" onerror="this.src='https://placehold.co/100x133/2a2a2a/666?text=Kairos'">
+                    </div>
+                    <div class="cart-item-details">
                         <div class="cart-item-name">${item.name}</div>
                         <div class="cart-item-price">${item.price}€</div>
-                    </div>
-                    <div class="cart-item-controls">
-                        <button class="cart-qty-btn cart-decr" data-id="${item.id}">-</button>
-                        <span class="cart-item-qty">${item.quantity}</span>
-                        <button class="cart-qty-btn cart-incr" data-id="${item.id}">+</button>
-                        <button class="cart-remove-btn" data-id="${item.id}">🗑️</button>
+                        <div class="cart-item-controls">
+                            <div class="qty-control">
+                                <button class="cart-qty-btn cart-decr" data-id="${item.id}">-</button>
+                                <span class="cart-item-qty">${item.quantity}</span>
+                                <button class="cart-qty-btn cart-incr" data-id="${item.id}">+</button>
+                            </div>
+                            <button class="cart-remove-btn" data-id="${item.id}" title="Eliminar del carrito">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="3 6 5 6 21 6"></polyline>
+                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                </svg>
+                            </button>
+                        </div>
                     </div>
                     <div class="cart-item-subtotal">${(item.price * item.quantity)}€</div>
                 </div>
@@ -246,8 +256,7 @@ function initModal() {
                 showNotification('Tu carrito está vacío');
                 return;
             }
-            showNotification('Contáctanos por Instagram @kairos.wear para completar tu pedido');
-            modal.style.display = 'none';
+            window.location.href = 'checkout.html';
         });
     }
     
@@ -291,107 +300,4 @@ document.addEventListener('DOMContentLoaded', () => {
     initModal();
     initNewsletter();
 });
-
-// Añadir animación
-const style = document.createElement('style');
-style.textContent = `
-    @keyframes fadeInOut {
-        0% { opacity: 0; transform: translateY(20px); }
-        15% { opacity: 1; transform: translateY(0); }
-        85% { opacity: 1; transform: translateY(0); }
-        100% { opacity: 0; transform: translateY(-20px); }
-    }
-    
-    /* Estilos para el carrito mejorado */
-    .cart-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 12px 0;
-        border-bottom: 1px solid #2a2a2a;
-        gap: 10px;
-        flex-wrap: wrap;
-    }
-    
-    .cart-item-info {
-        flex: 2;
-        min-width: 120px;
-    }
-    
-    .cart-item-name {
-        font-weight: 600;
-        font-size: 0.9rem;
-        margin-bottom: 4px;
-    }
-    
-    .cart-item-price {
-        font-size: 0.8rem;
-        color: #b87c4f;
-    }
-    
-    .cart-item-controls {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-    
-    .cart-qty-btn {
-        background: #2a2a2a;
-        border: 1px solid #3a3a3a;
-        color: #e5e5e5;
-        width: 28px;
-        height: 28px;
-        border-radius: 4px;
-        cursor: pointer;
-        font-size: 1rem;
-        transition: all 0.3s;
-    }
-    
-    .cart-qty-btn:hover {
-        background: #b87c4f;
-        border-color: #b87c4f;
-        color: #0a0a0a;
-    }
-    
-    .cart-item-qty {
-        min-width: 30px;
-        text-align: center;
-        font-weight: 600;
-    }
-    
-    .cart-remove-btn {
-        background: none;
-        border: none;
-        cursor: pointer;
-        font-size: 1.1rem;
-        opacity: 0.6;
-        transition: opacity 0.3s;
-    }
-    
-    .cart-remove-btn:hover {
-        opacity: 1;
-    }
-    
-    .cart-item-subtotal {
-        min-width: 60px;
-        text-align: right;
-        font-weight: 600;
-        color: #b87c4f;
-    }
-    
-    @media (max-width: 600px) {
-        .cart-item {
-            flex-direction: column;
-            align-items: flex-start;
-        }
-        .cart-item-subtotal {
-            text-align: left;
-            width: 100%;
-        }
-        .cart-item-controls {
-            width: 100%;
-            justify-content: flex-start;
-        }
-    }
-`;
-document.head.appendChild(style);
+

@@ -358,7 +358,7 @@ footer {
     font-size: 0.75rem;
 }
 
-/* Modal carrito */
+/* Modal carrito (Rediseñado a Slide-out Sidebar Drawer) */
 .modal {
     display: none;
     position: fixed;
@@ -367,72 +367,264 @@ footer {
     top: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.8);
+    background-color: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(8px);
+    transition: opacity 0.3s ease;
 }
 
 .modal-content {
-    background-color: #1a1a1a;
-    margin: 10% auto;
-    padding: 2rem;
-    width: 90%;
-    max-width: 500px;
-    border-radius: 8px;
-    position: relative;
+    background-color: #111111;
+    border-left: 1px solid rgba(255, 255, 255, 0.08);
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 100%;
+    max-width: 440px;
+    height: 100%;
+    margin: 0;
+    border-radius: 0;
+    padding: 2.5rem 2rem;
+    display: flex;
+    flex-direction: column;
+    box-shadow: -10px 0 40px rgba(0, 0, 0, 0.6);
+    animation: slideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+    }
+    to {
+        transform: translateX(0);
+    }
 }
 
 .close {
     position: absolute;
     right: 1.5rem;
-    top: 1rem;
-    font-size: 1.5rem;
+    top: 1.5rem;
+    font-size: 1.8rem;
     cursor: pointer;
-    color: #b0b0b0;
+    color: #888;
+    transition: color 0.2s, transform 0.2s;
+    line-height: 1;
 }
 
 .close:hover {
     color: #b87c4f;
+    transform: rotate(90deg);
 }
 
 .modal-content h3 {
-    margin-bottom: 1rem;
+    font-size: 1.3rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    padding-bottom: 1rem;
+    color: #e5e5e5;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
 #cartItems {
-    margin-bottom: 1rem;
-    max-height: 300px;
+    flex: 1;
     overflow-y: auto;
+    margin-bottom: 1.5rem;
+    padding-right: 0.5rem;
 }
 
+/* Custom scrollbar para items del carrito */
+#cartItems::-webkit-scrollbar {
+    width: 6px;
+}
+#cartItems::-webkit-scrollbar-track {
+    background: transparent;
+}
+#cartItems::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+}
+#cartItems::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* Items del Carrito Premium */
 .cart-item {
     display: flex;
-    justify-content: space-between;
-    padding: 0.5rem 0;
-    border-bottom: 1px solid #2a2a2a;
+    align-items: center;
+    padding: 1rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    gap: 1rem;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.cart-item-img {
+    width: 70px;
+    height: 90px;
+    border-radius: 6px;
+    overflow: hidden;
+    background: #1a1a1a;
+    flex-shrink: 0;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.cart-item-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.cart-item-details {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.cart-item-name {
+    font-weight: 600;
+    font-size: 0.88rem;
+    color: #e5e5e5;
+    line-height: 1.3;
+}
+
+.cart-item-price {
+    font-size: 0.85rem;
+    color: #888;
+}
+
+.cart-item-controls {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 0.2rem;
+}
+
+.qty-control {
+    display: flex;
+    align-items: center;
+    background: #1f1f1f;
+    border-radius: 4px;
+    padding: 2px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.cart-qty-btn {
+    background: transparent;
+    border: none;
+    color: #b0b0b0;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    border-radius: 3px;
+}
+
+.cart-qty-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #e5e5e5;
+}
+
+.cart-item-qty {
+    font-size: 0.85rem;
+    font-weight: 600;
+    min-width: 24px;
+    text-align: center;
+    color: #e5e5e5;
+}
+
+.cart-remove-btn {
+    background: transparent;
+    border: none;
+    color: #666;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+    transition: all 0.2s;
+    border-radius: 4px;
+}
+
+.cart-remove-btn:hover {
+    color: #ff6b6b;
+    background: rgba(255, 107, 107, 0.08);
+}
+
+.cart-item-subtotal {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: #b87c4f;
+    text-align: right;
+    min-width: 60px;
 }
 
 .cart-total {
-    text-align: right;
-    margin: 1rem 0;
-    padding-top: 0.5rem;
-    border-top: 1px solid #3a3a3a;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: auto;
+    padding: 1.5rem 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    font-size: 1.1rem;
+    color: #e5e5e5;
+}
+
+.cart-total strong span {
+    color: #b87c4f;
 }
 
 .btn-checkout {
     width: 100%;
-    padding: 0.8rem;
+    padding: 1rem;
     background: #b87c4f;
     color: #0a0a0a;
     border: none;
-    font-weight: 600;
+    font-weight: 700;
     cursor: pointer;
-    margin-top: 0.5rem;
+    font-size: 0.95rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+    border-radius: 4px;
+}
+
+.btn-checkout:hover {
+    background: #9a623d;
+    box-shadow: 0 4px 15px rgba(184, 124, 79, 0.2);
 }
 
 .checkout-note {
-    font-size: 0.7rem;
+    font-size: 0.75rem;
     text-align: center;
-    margin-top: 0.5rem;
-    color: #888;
+    margin-top: 0.8rem;
+    color: #666;
+}
+
+/* Animación de notificación fadeInOut */
+@keyframes fadeInOut {
+    0% { opacity: 0; transform: translateY(20px); }
+    15% { opacity: 1; transform: translateY(0); }
+    85% { opacity: 1; transform: translateY(0); }
+    100% { opacity: 0; transform: translateY(-20px); }
+}
+
+@media (max-width: 480px) {
+    .modal-content {
+        max-width: 100%;
+        padding: 2rem 1.2rem;
+    }
 }
 
 /* Product detail page */
