@@ -20,7 +20,7 @@ async function isBiometricAvailable() {
     }
 }
 
-// Registrar una nueva credencial biométrica
+// Registrar una nueva credencial biométrica (FORZANDO Face ID)
 async function registerBiometricCredential(user) {
     if (!isWebAuthnSupported()) {
         throw new Error('Tu navegador no soporta autenticación biométrica. Usa Chrome, Edge o Safari.');
@@ -35,11 +35,14 @@ async function registerBiometricCredential(user) {
         const challenge = new Uint8Array(32);
         crypto.getRandomValues(challenge);
 
+        // Determinar el RP ID correcto
+        const rpId = window.location.hostname === 'localhost' ? 'localhost' : window.location.hostname;
+
         const publicKeyOptions = {
             challenge: challenge,
             rp: {
                 name: 'Kairos Wear',
-                id: window.location.hostname
+                id: rpId
             },
             user: {
                 id: new TextEncoder().encode(user.id),
@@ -51,14 +54,17 @@ async function registerBiometricCredential(user) {
                 { type: 'public-key', alg: -257 }
             ],
             authenticatorSelection: {
-                authenticatorAttachment: 'platform',
+                authenticatorAttachment: 'platform',  // Fuerza Face ID en iPhone
                 userVerification: 'required',
-                residentKey: 'preferred'
+                residentKey: 'required',  // Cambiado de 'preferred' a 'required'
+                requireResidentKey: true  // Forzar que la clave sea residente
             },
             timeout: 60000,
             attestation: 'none',
             excludeCredentials: []
         };
+
+        console.log('🔐 Intentando registrar biometría con:', publicKeyOptions);
 
         const credential = await navigator.credentials.create({
             publicKey: publicKeyOptions
@@ -68,6 +74,8 @@ async function registerBiometricCredential(user) {
             throw new Error('No se pudo crear la credencial biométrica');
         }
 
+        console.log('✅ Credencial biométrica registrada:', credential.id);
+
         return {
             id: credential.id,
             rawId: arrayBufferToBase64(credential.rawId),
@@ -76,7 +84,15 @@ async function registerBiometricCredential(user) {
 
     } catch (error) {
         console.error('Error registrando credencial biométrica:', error);
-        throw new Error('Error al registrar: ' + error.message);
+        
+        // Mensajes de error más amigables
+        if (error.name === 'NotAllowedError') {
+            throw new Error('No se recibió autorización. Asegúrate de usar Face ID o Touch ID.');
+        } else if (error.name === 'InvalidStateError') {
+            throw new Error('Ya existe una credencial biométrica registrada para este dispositivo.');
+        } else {
+            throw new Error('Error al registrar: ' + error.message);
+        }
     }
 }
 
@@ -95,9 +111,11 @@ async function verifyBiometricLogin() {
         const challenge = new Uint8Array(32);
         crypto.getRandomValues(challenge);
 
+        const rpId = window.location.hostname === 'localhost' ? 'localhost' : window.location.hostname;
+
         const publicKeyOptions = {
             challenge: challenge,
-            rpId: window.location.hostname,
+            rpId: rpId,
             allowCredentials: [{
                 id: base64ToArrayBuffer(savedCredential.rawId),
                 type: 'public-key'
@@ -118,7 +136,12 @@ async function verifyBiometricLogin() {
 
     } catch (error) {
         console.error('Error verificando biometría:', error);
-        throw new Error('Verificación biométrica fallida: ' + error.message);
+        
+        if (error.name === 'NotAllowedError') {
+            throw new Error('No se recibió autorización. Asegúrate de usar Face ID o Touch ID.');
+        } else {
+            throw new Error('Verificación biométrica fallida: ' + error.message);
+        }
     }
 }
 
@@ -142,8 +165,19 @@ function base64ToArrayBuffer(base64) {
     return bytes.buffer;
 }
 
-// Exportar funciones para uso global
+// ============================================
+// FUNCIÓN AUXILIAR PARA LIMPIAR CREDENCIALES
+// ============================================
+function clearBiometricCredential() {
+    localStorage.removeItem('biometric_credential');
+    console.log('🗑️ Credencial biométrica eliminada');
+}
+
+// ============================================
+// EXPORTAR FUNCIONES PARA USO GLOBAL
+// ============================================
 window.isWebAuthnSupported = isWebAuthnSupported;
 window.isBiometricAvailable = isBiometricAvailable;
 window.registerBiometricCredential = registerBiometricCredential;
 window.verifyBiometricLogin = verifyBiometricLogin;
+window.clearBiometricCredential = clearBiometricCredential;
