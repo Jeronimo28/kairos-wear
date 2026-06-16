@@ -734,6 +734,7 @@
 
                 try {
                     await verifyBiometric();
+                    sessionStorage.setItem('biometric_verified', 'true');
                     message.innerHTML = '<div class="modal-message success">✅ Verificación biométrica correcta</div>';
 
                     setTimeout(() => {

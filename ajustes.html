@@ -1486,6 +1486,7 @@
         document.getElementById('logoutBtn').addEventListener('click', async () => {
             if (window.supabaseClient) await window.supabaseClient.auth.signOut();
             localStorage.removeItem('kairosUser');
+            sessionStorage.removeItem('biometric_verified');
             window.location.href = 'landing.html';
         });
     </script>

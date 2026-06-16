@@ -246,11 +246,24 @@
 
                 const { data: aalData } = await window.supabaseClient.auth.mfa.getAuthenticatorAssuranceLevel();
                 
-                if (aalData.currentLevel === 'aal2') {
-                    console.log('✅ Ya es AAL2, continuar');
+                const isBiometricVerified = sessionStorage.getItem('biometric_verified') === 'true';
+                const isTotpVerified = aalData.currentLevel === 'aal2';
+
+                // Si ya se verificó con el método preferido del usuario, no redirigir
+                if (mode === 'biometric' && isBiometricVerified) {
+                    console.log('✅ Biometría verificada, continuar');
+                    return;
+                }
+                if (mode === 'totp' && isTotpVerified) {
+                    console.log('✅ TOTP verificado, continuar');
+                    return;
+                }
+                if (mode === 'both' && isTotpVerified && isBiometricVerified) {
+                    console.log('✅ Ambos verificados, continuar');
                     return;
                 }
 
+                // Determinar qué método falta por verificar
                 let metodo = 'totp';
                 
                 if (hasTOTP && !hasBiometric) {
@@ -258,7 +271,17 @@
                 } else if (hasBiometric && !hasTOTP) {
                     metodo = 'biometric';
                 } else if (hasTOTP && hasBiometric) {
-                    metodo = mode;
+                    if (mode === 'both') {
+                        if (isTotpVerified && !isBiometricVerified) {
+                            metodo = 'biometric';
+                        } else if (!isTotpVerified && isBiometricVerified) {
+                            metodo = 'totp';
+                        } else {
+                            metodo = 'both';
+                        }
+                    } else {
+                        metodo = mode;
+                    }
                 }
 
                 console.log('🔐 Redirigiendo a mfa-verify.html con método:', metodo);
@@ -294,6 +317,7 @@
                 }
                 if (event === 'SIGNED_OUT') {
                     localStorage.removeItem('kairosUser');
+                    sessionStorage.removeItem('biometric_verified');
                     if (!window.location.pathname.includes('landing.html')) {
                         window.location.href = 'landing.html';
                     }

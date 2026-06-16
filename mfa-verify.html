@@ -385,6 +385,7 @@
                     throw new Error('Verificación biométrica fallida');
                 }
                 
+                sessionStorage.setItem('biometric_verified', 'true');
                 messageDiv.innerHTML = '<div class="message success">✅ Verificación biométrica correcta! Redirigiendo...</div>';
                 
                 localStorage.removeItem('mfaMethod');
