@@ -136,7 +136,7 @@
                 } else {
                     localStorage.removeItem('kairosUser');
                     const path = window.location.pathname;
-                    if (!path.includes('landing.html') && !path.includes('login.html') && !path.includes('register.html')) {
+                    if (!path.includes('landing.html') && !path.includes('login.html') && !path.includes('register.html') && !path.includes('mfa-verify.html')) {
                         window.location.href = 'landing.html';
                     }
                 }
