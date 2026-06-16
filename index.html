@@ -7,6 +7,51 @@
     <meta name="description" content="Kairos Wear. Ropa masculina para salir. Diseño atemporal, calidad y el instante perfecto.">
     <link rel="stylesheet" href="css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <style>
+        /* ARREGLOS PARA MÓVIL - Menú visible */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: flex !important;
+                flex-wrap: wrap;
+                gap: 0.8rem;
+                justify-content: center;
+                padding: 0.5rem 0;
+            }
+            .nav-links li {
+                list-style: none;
+            }
+            .nav-links a {
+                font-size: 0.75rem;
+                padding: 0.3rem 0.6rem;
+            }
+            /* Ajustar header para móvil */
+            header {
+                position: relative;
+                padding-top: 0.5rem;
+            }
+            nav {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 0.5rem;
+            }
+            .logo {
+                width: 100%;
+                text-align: center;
+            }
+            .cart-icon {
+                position: absolute;
+                right: 1rem;
+                top: 1rem;
+            }
+            .hero {
+                margin-top: 0;
+                height: 60vh;
+            }
+            .hero-content h1 {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
 </head>
 <body>
     <header>
@@ -174,14 +219,12 @@
         // ============================================
         async function verificarMFA(user) {
             try {
-                // 1. Obtener preferencias del usuario
                 const { data: prefs, error: prefsError } = await window.supabaseClient
                     .from('user_mfa_preferences')
                     .select('*')
                     .eq('user_id', user.id)
                     .single();
 
-                // 2. Si no tiene preferencias o no tiene MFA activado, no hacer nada
                 if (prefsError || !prefs) {
                     console.log('📋 Sin preferencias MFA, continuar');
                     return;
@@ -196,22 +239,18 @@
                 console.log('🖐️ Biometría activada:', hasBiometric);
                 console.log('⚙️ Modo:', mode);
 
-                // 3. Si no tiene ningún método MFA activado, no hacer nada
                 if (!hasTOTP && !hasBiometric) {
                     console.log('✅ Sin MFA activado, continuar');
                     return;
                 }
 
-                // 4. Verificar nivel actual de autenticación
                 const { data: aalData } = await window.supabaseClient.auth.mfa.getAuthenticatorAssuranceLevel();
                 
-                // 5. Si ya es AAL2, no hacer nada
                 if (aalData.currentLevel === 'aal2') {
                     console.log('✅ Ya es AAL2, continuar');
                     return;
                 }
 
-                // 6. Determinar qué método mostrar según preferencias
                 let metodo = 'totp';
                 
                 if (hasTOTP && !hasBiometric) {
@@ -219,16 +258,14 @@
                 } else if (hasBiometric && !hasTOTP) {
                     metodo = 'biometric';
                 } else if (hasTOTP && hasBiometric) {
-                    metodo = mode; // 'totp', 'biometric' o 'both'
+                    metodo = mode;
                 }
 
                 console.log('🔐 Redirigiendo a mfa-verify.html con método:', metodo);
 
-                // 7. Guardar el método en localStorage
                 localStorage.setItem('mfaMethod', metodo);
                 localStorage.setItem('mfaRedirectAfter', '/index.html');
 
-                // 8. Redirigir a la página de verificación
                 if (!window.location.pathname.includes('mfa-verify.html')) {
                     window.location.href = 'mfa-verify.html';
                 }
@@ -238,9 +275,6 @@
             }
         }
 
-        // ============================================
-        // ESCUCHAR CAMBIOS DE AUTENTICACIÓN
-        // ============================================
         if (window.supabaseClient) {
             window.supabaseClient.auth.onAuthStateChange((event, session) => {
                 if (event === 'SIGNED_IN' && session) {
@@ -267,9 +301,6 @@
             });
         }
 
-        // ============================================
-        // INICIAR
-        // ============================================
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', verificarSesionYRedirigir);
         } else {
