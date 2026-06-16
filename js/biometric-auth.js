@@ -118,7 +118,8 @@ async function verifyBiometricLogin() {
             rpId: rpId,
             allowCredentials: [{
                 id: base64ToArrayBuffer(savedCredential.rawId),
-                type: 'public-key'
+                type: 'public-key',
+                transports: ['internal']
             }],
             userVerification: 'required',
             timeout: 60000
