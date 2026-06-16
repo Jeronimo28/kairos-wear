@@ -264,7 +264,7 @@
                 console.log('🔐 Redirigiendo a mfa-verify.html con método:', metodo);
 
                 localStorage.setItem('mfaMethod', metodo);
-                localStorage.setItem('mfaRedirectAfter', '/index.html');
+                localStorage.setItem('mfaRedirectAfter', 'index.html');
 
                 if (!window.location.pathname.includes('mfa-verify.html')) {
                     window.location.href = 'mfa-verify.html';

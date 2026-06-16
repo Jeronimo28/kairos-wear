@@ -30,7 +30,7 @@ window.logoutKairos = async function() {
 }
 
 // ========== VERIFICAR 2FA Y REDIRIGIR ==========
-window.checkMFAAndRedirect = async function(redirectUrl = '/index.html') {
+window.checkMFAAndRedirect = async function(redirectUrl = 'index.html') {
     try {
         // Primero asegurar que tenemos sesión
         const { data: { session } } = await window.supabaseClient.auth.getSession();
