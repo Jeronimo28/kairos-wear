@@ -79,6 +79,23 @@
             background: #b87c4f;
             color: #0a0a0a;
         }
+        .btn-secondary {
+            width: 100%;
+            padding: 0.8rem;
+            background: transparent;
+            color: #888;
+            border: 1px solid #3a3a3a;
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+            transition: all 0.3s;
+        }
+        .btn-secondary:hover {
+            background: #2a2a2a;
+            color: #e5e5e5;
+        }
         .message {
             margin-top: 1rem;
             padding: 0.75rem;
@@ -127,6 +144,9 @@
             border-color: #b87c4f;
             color: #0a0a0a;
         }
+        .hidden {
+            display: none !important;
+        }
     </style>
 </head>
 <body>
@@ -135,7 +155,7 @@
         <p id="methodDescription">Introduce el código de 6 dígitos de tu app de autenticación</p>
         
         <!-- Selector de método (visible solo si ambos están activos) -->
-        <div id="methodSelector" class="method-selector" style="display:none;">
+        <div id="methodSelector" class="method-selector hidden">
             <button id="methodTotp" class="active">📱 Código</button>
             <button id="methodBiometric">🖐️ Biometría</button>
         </div>
@@ -147,12 +167,13 @@
         </div>
         
         <!-- Contenedor para Biometría -->
-        <div id="biometricContainer" style="display:none;">
+        <div id="biometricContainer" class="hidden">
             <div class="biometric-icon">🖐️</div>
             <p style="font-size:0.85rem; color:#b0b0b0; margin-bottom:1rem;">
                 Coloca tu huella o usa Face ID para verificar tu identidad
             </p>
             <button id="biometricVerifyBtn" class="btn-biometric">🔐 VERIFICAR CON BIOMETRÍA</button>
+            <button id="switchToTotpBtn" class="btn-secondary">📱 Usar código de 6 dígitos</button>
         </div>
         
         <div id="message"></div>
@@ -169,15 +190,14 @@
         // ============================================
         let factorId = null;
         let currentMethod = 'totp';
-        let mfaMethod = 'totp';
         let returnUrl = '/index.html';
+        let mfaMethod = 'totp';
 
         // ============================================
         // INICIALIZAR
         // ============================================
         async function initializeMFA() {
             try {
-                // 1. Obtener el método desde localStorage (guardado por index.html)
                 mfaMethod = localStorage.getItem('mfaMethod') || 'totp';
                 returnUrl = localStorage.getItem('mfaRedirectAfter') || '/index.html';
                 
@@ -185,58 +205,46 @@
                 console.log('📋 Método solicitado:', mfaMethod);
                 console.log('📋 URL de retorno:', returnUrl);
 
-                // 2. Obtener el factor TOTP del usuario (si existe)
                 const { data: factors, error: factorsError } = await window.supabaseClient.auth.mfa.listFactors();
-                
                 if (factorsError) throw factorsError;
                 
-                const totpFactor = factors.totp.find(f => f.status === 'verified');
-                
-                // 3. Verificar si el usuario tiene algún método activo
-                const hasTOTP = !!totpFactor;
-                
-                // 4. Verificar si tiene biometría registrada
+                const hasTOTP = factors.totp && factors.totp.some(f => f.status === 'verified');
                 const hasBiometric = localStorage.getItem('biometric_credential') !== null;
                 
                 console.log('📱 TOTP disponible:', hasTOTP);
                 console.log('🖐️ Biometría disponible:', hasBiometric);
 
-                // 5. Si no tiene ningún método, mostrar error
                 if (!hasTOTP && !hasBiometric) {
                     document.getElementById('message').innerHTML = 
                         '<div class="message error">❌ No tienes ningún método de autenticación activado. Configúralo desde ajustes.</div>';
                     return false;
                 }
 
-                // 6. Determinar qué método mostrar según preferencias y disponibilidad
-                if (mfaMethod === 'totp' && hasTOTP) {
-                    currentMethod = 'totp';
-                } else if (mfaMethod === 'biometric' && hasBiometric) {
+                // Determinar qué método mostrar
+                if (mfaMethod === 'biometric' && hasBiometric) {
                     currentMethod = 'biometric';
+                    showMethod('biometric');
+                } else if (mfaMethod === 'totp' && hasTOTP) {
+                    currentMethod = 'totp';
+                    showMethod('totp');
                 } else if (mfaMethod === 'both' && hasTOTP && hasBiometric) {
-                    currentMethod = 'totp'; // Empezamos con TOTP
-                    // Mostrar selector de método
-                    document.getElementById('methodSelector').style.display = 'flex';
+                    currentMethod = 'totp';
+                    showMethod('totp');
+                    document.getElementById('methodSelector').classList.remove('hidden');
                 } else {
-                    // Fallback: usar lo que esté disponible
-                    if (hasTOTP) {
-                        currentMethod = 'totp';
-                    } else if (hasBiometric) {
+                    if (hasBiometric) {
                         currentMethod = 'biometric';
-                    } else {
-                        document.getElementById('message').innerHTML = 
-                            '<div class="message error">❌ No hay método disponible.</div>';
-                        return false;
+                        showMethod('biometric');
+                    } else if (hasTOTP) {
+                        currentMethod = 'totp';
+                        showMethod('totp');
                     }
                 }
 
-                // 7. Guardar factor ID si tiene TOTP
                 if (hasTOTP) {
+                    const totpFactor = factors.totp.find(f => f.status === 'verified');
                     factorId = totpFactor.id;
                 }
-
-                // 8. Mostrar la interfaz correspondiente
-                showMethod(currentMethod);
                 
                 return true;
 
@@ -249,28 +257,26 @@
         }
 
         // ============================================
-        // MOSTRAR MÉTODO SELECCIONADO
+        // MOSTRAR MÉTODO
         // ============================================
         function showMethod(method) {
             const totpContainer = document.getElementById('totpContainer');
             const biometricContainer = document.getElementById('biometricContainer');
             const description = document.getElementById('methodDescription');
             
-            // Actualizar botones del selector
             document.getElementById('methodTotp').classList.toggle('active', method === 'totp');
             document.getElementById('methodBiometric').classList.toggle('active', method === 'biometric');
             
             if (method === 'totp') {
-                totpContainer.style.display = 'block';
-                biometricContainer.style.display = 'none';
+                totpContainer.classList.remove('hidden');
+                biometricContainer.classList.add('hidden');
                 description.textContent = 'Introduce el código de 6 dígitos de tu app de autenticación';
                 document.getElementById('codeInput').focus();
             } else {
-                totpContainer.style.display = 'none';
-                biometricContainer.style.display = 'block';
+                totpContainer.classList.add('hidden');
+                biometricContainer.classList.remove('hidden');
                 description.textContent = 'Verifica tu identidad con tu huella o Face ID';
             }
-            
             currentMethod = method;
         }
 
@@ -373,6 +379,23 @@
                 messageDiv.innerHTML = `<div class="message error">❌ ${error.message || 'Verificación fallida'}</div>`;
                 verifyBtn.disabled = false;
                 verifyBtn.textContent = '🔐 VERIFICAR CON BIOMETRÍA';
+                
+                // Mostrar botón para cambiar a TOTP
+                document.getElementById('switchToTotpBtn').style.display = 'block';
+            }
+        }
+
+        // ============================================
+        // CAMBIAR DE BIOMETRÍA A TOTP
+        // ============================================
+        function switchToTotp() {
+            if (factorId) {
+                showMethod('totp');
+                document.getElementById('message').innerHTML = '';
+                document.getElementById('codeInput').focus();
+            } else {
+                document.getElementById('message').innerHTML = 
+                    '<div class="message error">❌ No tienes código 2FA configurado. Actívalo desde ajustes.</div>';
             }
         }
 
@@ -385,6 +408,9 @@
         });
         
         document.getElementById('biometricVerifyBtn').addEventListener('click', verifyBiometric);
+        
+        // Botón para cambiar de biometría a TOTP
+        document.getElementById('switchToTotpBtn').addEventListener('click', switchToTotp);
         
         // Selector de método (modo 'both')
         document.getElementById('methodTotp').addEventListener('click', function() {
