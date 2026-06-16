@@ -78,6 +78,12 @@ nav {
     font-weight: 600;
 }
 
+.logo-img {
+    height: 75px;
+    width: auto;
+    display: block;
+}
+
 /* Hero */
 .hero {
     height: 80vh;
@@ -429,31 +435,6 @@ footer {
     color: #888;
 }
 
-.logo-img {
-    height: 75px;
-    width: auto;
-    display: block;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-    .hero-content h1 {
-        font-size: 2rem;
-    }
-    
-    .nav-links {
-        display: none;
-    }
-    
-    .products-grid {
-        grid-template-columns: 1fr 1fr;
-        gap: 1rem;
-    }
-    
-    .collection {
-        padding: 3rem 1rem;
-    }
-
 /* Product detail page */
 .product-detail {
     padding: 8rem 5% 5rem;
@@ -505,17 +486,6 @@ footer {
     color: #b87c4f;
 }
 
-@media (max-width: 768px) {
-    .product-detail-container {
-        grid-template-columns: 1fr;
-        gap: 2rem;
-    }
-    
-    .product-detail {
-        padding: 6rem 1rem 3rem;
-    }
-}
-
 .password-wrapper {
     position: relative;
     margin-bottom: 1rem;
@@ -553,4 +523,86 @@ footer {
 .toggle-password:hover {
     color: #9a623d;
 }
+
+/* ============================================ */
+/* RESPONSIVE PARA MÓVIL - MENÚ VISIBLE */
+/* ============================================ */
+@media (max-width: 768px) {
+    /* Mostrar menú en móvil */
+    .nav-links {
+        display: flex !important;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        justify-content: center;
+        padding: 0.3rem 0;
+    }
+    .nav-links li {
+        list-style: none;
+    }
+    .nav-links a {
+        font-size: 0.7rem;
+        padding: 0.2rem 0.5rem;
+        letter-spacing: 0.5px;
+    }
+    
+    /* Ajustar header para móvil */
+    header {
+        position: relative;
+        padding-top: 0.5rem;
+    }
+    nav {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 0.3rem;
+        padding: 0.5rem 2%;
+    }
+    .logo {
+        width: 100%;
+        text-align: center;
+    }
+    .logo-img {
+        height: 50px;
+    }
+    .cart-icon {
+        position: absolute;
+        right: 0.8rem;
+        top: 0.8rem;
+    }
+    
+    /* Hero */
+    .hero {
+        margin-top: 0;
+        height: 60vh;
+    }
+    .hero-content h1 {
+        font-size: 1.8rem;
+    }
+    .subtitle {
+        font-size: 0.9rem;
+    }
+    
+    /* Productos */
+    .products-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 0.8rem;
+    }
+    .collection {
+        padding: 2rem 0.8rem;
+    }
+    
+    /* Product detail */
+    .product-detail-container {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    .product-detail {
+        padding: 5rem 1rem 2rem;
+    }
+    
+    /* Modal carrito */
+    .modal-content {
+        margin: 20% auto;
+        padding: 1.2rem;
+        width: 95%;
+    }
 }
