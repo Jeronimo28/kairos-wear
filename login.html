@@ -474,6 +474,9 @@
         // ============================================
         async function verifyTOTPCode(code) {
             try {
+                if (!mfaFactorId) {
+                    throw new Error('No se encontró un factor de autenticación de 6 dígitos verificado.');
+                }
                 const { data: challenge, error: challengeError } = await window.supabaseClient.auth.mfa.challenge({
                     factorId: mfaFactorId
                 });
