@@ -1391,6 +1391,13 @@
                     }
                     return;
                 }
+
+                // Si hay un factor TOTP no verificado (pendiente), lo eliminamos para poder crear uno nuevo limpio
+                const unverifiedTotp = totpFactors.find(f => f.status === 'unverified');
+                if (unverifiedTotp) {
+                    console.log('🗑️ Eliminando factor TOTP no verificado pendiente:', unverifiedTotp.id);
+                    await window.supabaseClient.auth.mfa.unenroll({ factorId: unverifiedTotp.id });
+                }
                 
                 modalTitle.textContent = 'Activar código de 6 dígitos';
                 messageDiv.innerHTML = '';
