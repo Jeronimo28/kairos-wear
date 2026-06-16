@@ -536,7 +536,7 @@
         // PROCESAR LOGIN CON MFA
         // ============================================
         async function processLoginWithMFA(user, preferences) {
-            const hasTOTP = preferences?.totp_enabled === true;
+            let hasTOTP = preferences?.totp_enabled === true;
             const hasBiometric = preferences?.biometric_enabled === true;
             const mode = preferences?.mode || 'totp';
 
@@ -563,9 +563,11 @@
                         console.log('📱 Factor TOTP encontrado:', mfaFactorId);
                     } else {
                         console.warn('⚠️ TOTP activado pero no se encontró factor verificado');
+                        hasTOTP = false;
                     }
                 } catch (error) {
                     console.error('Error obteniendo factor TOTP:', error);
+                    hasTOTP = false;
                 }
             }
 
