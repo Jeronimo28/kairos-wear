@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verificación · Kairos Wear</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+            color: #e5e5e5;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .verify-container {
+            max-width: 400px;
+            margin: 2rem;
+            padding: 2rem;
+            background: #1a1a1a;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .verify-container h1 {
+            margin-bottom: 1rem;
+            font-size: 1.8rem;
+        }
+        .verify-container p {
+            color: #b0b0b0;
+            margin-bottom: 2rem;
+        }
+        .code-input {
+            width: 100%;
+            padding: 1rem;
+            font-size: 1.5rem;
+            text-align: center;
+            letter-spacing: 4px;
+            background: #2a2a2a;
+            border: 1px solid #3a3a3a;
+            color: #e5e5e5;
+            border-radius: 4px;
+            margin-bottom: 1.5rem;
+        }
+        .btn-verify {
+            width: 100%;
+            padding: 1rem;
+            background: #b87c4f;
+            color: #0a0a0a;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        .btn-verify:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .btn-biometric {
+            width: 100%;
+            padding: 1rem;
+            background: #2a2a2a;
+            color: #e5e5e5;
+            border: 2px solid #b87c4f;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 1rem;
+            margin-top: 0.5rem;
+        }
+        .btn-biometric:hover {
+            background: #b87c4f;
+            color: #0a0a0a;
+        }
+        .message {
+            margin-top: 1rem;
+            padding: 0.75rem;
+            border-radius: 4px;
+            font-size: 0.85rem;
+        }
+        .error {
+            background: rgba(255, 107, 107, 0.2);
+            color: #ff6b6b;
+        }
+        .success {
+            background: rgba(76, 175, 80, 0.2);
+            color: #4caf50;
+        }
+        .loading {
+            color: #b87c4f;
+        }
+        .back-link {
+            display: inline-block;
+            margin-top: 1rem;
+            color: #888;
+            font-size: 0.8rem;
+        }
+        .biometric-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        .method-selector {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            justify-content: center;
+        }
+        .method-selector button {
+            padding: 0.5rem 1rem;
+            background: #2a2a2a;
+            border: 1px solid #3a3a3a;
+            color: #888;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+        .method-selector button.active {
+            background: #b87c4f;
+            border-color: #b87c4f;
+            color: #0a0a0a;
+        }
+    </style>
+</head>
+<body>
+    <div class="verify-container">
+        <h1>🔐 Verificación en dos pasos</h1>
+        <p id="methodDescription">Introduce el código de 6 dígitos de tu app de autenticación</p>
+        
+        <!-- Selector de método (visible solo si ambos están activos) -->
+        <div id="methodSelector" class="method-selector" style="display:none;">
+            <button id="methodTotp" class="active">📱 Código</button>
+            <button id="methodBiometric">🖐️ Biometría</button>
+        </div>
+        
+        <!-- Contenedor para TOTP -->
+        <div id="totpContainer">
+            <input type="text" id="codeInput" class="code-input" placeholder="000000" maxlength="6" autocomplete="off">
+            <button id="verifyBtn" class="btn-verify">VERIFICAR</button>
+        </div>
+        
+        <!-- Contenedor para Biometría -->
+        <div id="biometricContainer" style="display:none;">
+            <div class="biometric-icon">🖐️</div>
+            <p style="font-size:0.85rem; color:#b0b0b0; margin-bottom:1rem;">
+                Coloca tu huella o usa Face ID para verificar tu identidad
+            </p>
+            <button id="biometricVerifyBtn" class="btn-biometric">🔐 VERIFICAR CON BIOMETRÍA</button>
+        </div>
+        
+        <div id="message"></div>
+        <a href="landing.html" class="back-link">← Volver al inicio</a>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+    <script src="js/supabase.js"></script>
+    <script src="js/biometric-auth.js"></script>
+
+    <script>
+        // ============================================
+        // VARIABLES GLOBALES
+        // ============================================
+        let factorId = null;
+        let currentMethod = 'totp';
+        let mfaMethod = 'totp';
+        let returnUrl = '/index.html';
+
+        // ============================================
+        // INICIALIZAR
+        // ============================================
+        async function initializeMFA() {
+            try {
+                // 1. Obtener el método desde localStorage (guardado por index.html)
+                mfaMethod = localStorage.getItem('mfaMethod') || 'totp';
+                returnUrl = localStorage.getItem('mfaRedirectAfter') || '/index.html';
+                
+                console.log('🔐 mfa-verify.html iniciado');
+                console.log('📋 Método solicitado:', mfaMethod);
+                console.log('📋 URL de retorno:', returnUrl);
+
+                // 2. Obtener el factor TOTP del usuario (si existe)
+                const { data: factors, error: factorsError } = await window.supabaseClient.auth.mfa.listFactors();
+                
+                if (factorsError) throw factorsError;
+                
+                const totpFactor = factors.totp.find(f => f.status === 'verified');
+                
+                // 3. Verificar si el usuario tiene algún método activo
+                const hasTOTP = !!totpFactor;
+                
+                // 4. Verificar si tiene biometría registrada
+                const hasBiometric = localStorage.getItem('biometric_credential') !== null;
+                
+                console.log('📱 TOTP disponible:', hasTOTP);
+                console.log('🖐️ Biometría disponible:', hasBiometric);
+
+                // 5. Si no tiene ningún método, mostrar error
+                if (!hasTOTP && !hasBiometric) {
+                    document.getElementById('message').innerHTML = 
+                        '<div class="message error">❌ No tienes ningún método de autenticación activado. Configúralo desde ajustes.</div>';
+                    return false;
+                }
+
+                // 6. Determinar qué método mostrar según preferencias y disponibilidad
+                if (mfaMethod === 'totp' && hasTOTP) {
+                    currentMethod = 'totp';
+                } else if (mfaMethod === 'biometric' && hasBiometric) {
+                    currentMethod = 'biometric';
+                } else if (mfaMethod === 'both' && hasTOTP && hasBiometric) {
+                    currentMethod = 'totp'; // Empezamos con TOTP
+                    // Mostrar selector de método
+                    document.getElementById('methodSelector').style.display = 'flex';
+                } else {
+                    // Fallback: usar lo que esté disponible
+                    if (hasTOTP) {
+                        currentMethod = 'totp';
+                    } else if (hasBiometric) {
+                        currentMethod = 'biometric';
+                    } else {
+                        document.getElementById('message').innerHTML = 
+                            '<div class="message error">❌ No hay método disponible.</div>';
+                        return false;
+                    }
+                }
+
+                // 7. Guardar factor ID si tiene TOTP
+                if (hasTOTP) {
+                    factorId = totpFactor.id;
+                }
+
+                // 8. Mostrar la interfaz correspondiente
+                showMethod(currentMethod);
+                
+                return true;
+
+            } catch (error) {
+                console.error('Error inicializando MFA:', error);
+                document.getElementById('message').innerHTML = 
+                    '<div class="message error">❌ Error al iniciar verificación</div>';
+                return false;
+            }
+        }
+
+        // ============================================
+        // MOSTRAR MÉTODO SELECCIONADO
+        // ============================================
+        function showMethod(method) {
+            const totpContainer = document.getElementById('totpContainer');
+            const biometricContainer = document.getElementById('biometricContainer');
+            const description = document.getElementById('methodDescription');
+            
+            // Actualizar botones del selector
+            document.getElementById('methodTotp').classList.toggle('active', method === 'totp');
+            document.getElementById('methodBiometric').classList.toggle('active', method === 'biometric');
+            
+            if (method === 'totp') {
+                totpContainer.style.display = 'block';
+                biometricContainer.style.display = 'none';
+                description.textContent = 'Introduce el código de 6 dígitos de tu app de autenticación';
+                document.getElementById('codeInput').focus();
+            } else {
+                totpContainer.style.display = 'none';
+                biometricContainer.style.display = 'block';
+                description.textContent = 'Verifica tu identidad con tu huella o Face ID';
+            }
+            
+            currentMethod = method;
+        }
+
+        // ============================================
+        // VERIFICAR TOTP
+        // ============================================
+        async function verifyTOTP() {
+            const code = document.getElementById('codeInput').value.trim();
+            const messageDiv = document.getElementById('message');
+            const verifyBtn = document.getElementById('verifyBtn');
+            
+            if (!code || code.length !== 6) {
+                messageDiv.innerHTML = '<div class="message error">❌ Introduce un código de 6 dígitos</div>';
+                return;
+            }
+            
+            verifyBtn.disabled = true;
+            verifyBtn.textContent = 'VERIFICANDO...';
+            messageDiv.innerHTML = '<div class="message loading">⏳ Verificando código...</div>';
+            
+            try {
+                const { data: challenge, error: challengeError } = await window.supabaseClient.auth.mfa.challenge({
+                    factorId: factorId
+                });
+                if (challengeError) throw challengeError;
+                
+                const { data: verifyData, error: verifyError } = await window.supabaseClient.auth.mfa.verify({
+                    factorId: factorId,
+                    challengeId: challenge.id,
+                    code: code
+                });
+                if (verifyError) throw verifyError;
+                
+                if (verifyData && verifyData.access_token) {
+                    const { error: setSessionError } = await window.supabaseClient.auth.setSession({
+                        access_token: verifyData.access_token,
+                        refresh_token: verifyData.refresh_token || (await window.supabaseClient.auth.getSession()).data.session?.refresh_token
+                    });
+                    if (setSessionError) throw setSessionError;
+                }
+                
+                await window.supabaseClient.auth.refreshSession();
+                
+                messageDiv.innerHTML = '<div class="message success">✅ Código correcto! Redirigiendo...</div>';
+                
+                localStorage.removeItem('mfaMethod');
+                localStorage.removeItem('mfaRedirectAfter');
+                
+                setTimeout(() => {
+                    window.location.href = returnUrl;
+                }, 1500);
+                
+            } catch (error) {
+                console.error('Error:', error);
+                messageDiv.innerHTML = '<div class="message error">❌ Código incorrecto. Inténtalo de nuevo.</div>';
+                verifyBtn.disabled = false;
+                verifyBtn.textContent = 'VERIFICAR';
+                document.getElementById('codeInput').value = '';
+                document.getElementById('codeInput').focus();
+            }
+        }
+
+        // ============================================
+        // VERIFICAR BIOMETRÍA
+        // ============================================
+        async function verifyBiometric() {
+            const messageDiv = document.getElementById('message');
+            const verifyBtn = document.getElementById('biometricVerifyBtn');
+            
+            verifyBtn.disabled = true;
+            verifyBtn.textContent = 'VERIFICANDO...';
+            messageDiv.innerHTML = '<div class="message loading">⏳ Esperando verificación biométrica...</div>';
+            
+            try {
+                if (!window.isWebAuthnSupported || !isWebAuthnSupported()) {
+                    throw new Error('Tu navegador no soporta autenticación biométrica.');
+                }
+                
+                const available = await isBiometricAvailable();
+                if (!available) {
+                    throw new Error('Tu dispositivo no tiene sensor biométrico disponible.');
+                }
+                
+                const credential = await verifyBiometricLogin();
+                if (!credential) {
+                    throw new Error('Verificación biométrica fallida');
+                }
+                
+                messageDiv.innerHTML = '<div class="message success">✅ Verificación biométrica correcta! Redirigiendo...</div>';
+                
+                localStorage.removeItem('mfaMethod');
+                localStorage.removeItem('mfaRedirectAfter');
+                
+                setTimeout(() => {
+                    window.location.href = returnUrl;
+                }, 1500);
+                
+            } catch (error) {
+                console.error('Error:', error);
+                messageDiv.innerHTML = `<div class="message error">❌ ${error.message || 'Verificación fallida'}</div>`;
+                verifyBtn.disabled = false;
+                verifyBtn.textContent = '🔐 VERIFICAR CON BIOMETRÍA';
+            }
+        }
+
+        // ============================================
+        // EVENTOS
+        // ============================================
+        document.getElementById('verifyBtn').addEventListener('click', verifyTOTP);
+        document.getElementById('codeInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') verifyTOTP();
+        });
+        
+        document.getElementById('biometricVerifyBtn').addEventListener('click', verifyBiometric);
+        
+        // Selector de método (modo 'both')
+        document.getElementById('methodTotp').addEventListener('click', function() {
+            showMethod('totp');
+        });
+        document.getElementById('methodBiometric').addEventListener('click', function() {
+            showMethod('biometric');
+        });
+
+        // ============================================
+        // INICIAR
+        // ============================================
+        initializeMFA();
+    </script>
+</body>
+</html>

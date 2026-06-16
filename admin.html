@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin · Kairos Wear</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <style>
+        .admin-container {
+            max-width: 1200px;
+            margin: 120px auto 60px;
+            padding: 0 2rem;
+        }
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        .admin-header h1 {
+            font-size: 1.8rem;
+        }
+        .tabs {
+            display: flex;
+            gap: 1rem;
+            border-bottom: 1px solid #2a2a2a;
+            margin-bottom: 2rem;
+        }
+        .tab {
+            padding: 0.8rem 1.5rem;
+            cursor: pointer;
+            color: #888;
+            border-bottom: 2px solid transparent;
+        }
+        .tab.active {
+            color: #b87c4f;
+            border-bottom-color: #b87c4f;
+        }
+        .photos-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .photos-table th, .photos-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #2a2a2a;
+        }
+        .photos-table th {
+            color: #b87c4f;
+            font-weight: 600;
+        }
+        .photo-preview {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+        .btn-approve, .btn-reject {
+            padding: 0.4rem 1rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-right: 0.5rem;
+        }
+        .btn-approve {
+            background: #4caf50;
+            color: white;
+        }
+        .btn-approve:hover {
+            background: #45a049;
+        }
+        .btn-reject {
+            background: #ff6b6b;
+            color: white;
+        }
+        .btn-reject:hover {
+            background: #e55a5a;
+        }
+        .coupon-code {
+            background: #2a2a2a;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        .empty-message {
+            text-align: center;
+            padding: 3rem;
+            color: #888;
+        }
+        .status-badge {
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        .status-pending {
+            background: #ff9800;
+            color: #0a0a0a;
+        }
+        .status-approved {
+            background: #4caf50;
+            color: white;
+        }
+        .status-rejected {
+            background: #ff6b6b;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">
+                <a href="index.html">
+                    <img src="imagenes/logo.png" alt="Kairos" class="logo-img">
+                </a>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html">INICIO</a></li>
+                <li><a href="comunidad.html">COMUNIDAD</a></li>
+                <li><a href="admin.html" style="color: #b87c4f;">ADMIN</a></li>
+                <li><a href="#" id="loginLink">INICIAR SESIÓN</a></li>
+            </ul>
+            <div class="cart-icon" id="cartIcon">
+                <span class="cart-icon-symbol">🛒</span>
+                <span class="cart-count" id="cartCount">0</span>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <div class="admin-container">
+            <div class="admin-header">
+                <h1>⚙️ Panel de Administración</h1>
+                <div>Bienvenido, <span id="adminEmail"></span></div>
+            </div>
+            
+            <div class="tabs">
+                <div class="tab active" data-status="pending">📸 Pendientes</div>
+                <div class="tab" data-status="approved">✅ Aprobadas</div>
+                <div class="tab" data-status="rejected">❌ Rechazadas</div>
+            </div>
+            
+            <div id="photosList">
+                <div class="empty-message">Cargando fotos...</div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-logo">KAIROS WEAR</div>
+            <p class="footer-tagline">El momento oportuno</p>
+            <div class="social-links">
+                <a href="#">Instagram</a>
+                <a href="#">Twitter</a>
+                <a href="#">TikTok</a>
+            </div>
+            <p class="copyright">© 2026 Kairos Wear. Todos los momentos.</p>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+    <script src="js/supabase.js"></script>
+    
+    <script>
+        // ============================================      <<<<<<<<<<<<<<<<<<<<<
+        // VERIFICACIÓN SEGURA DE ADMIN
+        // ============================================
+
+        let adminUser = null;  // Variable que guardará los datos del administrador una vez verificado
+
+        async function verificarAdmin() {
+            try {
+                // 1. Obtener usuario real de Supabase (No de localStorage)
+                // auth.getUser() consulta directamente a Supabase, no al localStorage que el usuario puede modificar
+                const { data: { user }, error } = await window.supabaseClient.auth.getUser();
+                
+                // 2. Si hay error o no hay usuario, redirigir
+                if (error || !user) {
+                    console.log('No hay sesión activa');
+                    window.location.href = 'landing.html';  // Redirige a la página de inicio
+                    return false;
+                }
+                
+                // 3. Verificar que el email es el del administrador
+                if (user.email !== 'jerochico28@gmail.com') {
+                    console.log('Acceso denegado: no eres administrador');
+                    alert('No tienes permisos de administrador');
+                    window.location.href = 'index.html';  // Redirige a la tienda normal
+                    return false;
+                }
+                
+                // 4. Admin verificado ✅
+                adminUser = user;  // Guardamos el usuario admin para usarlo después
+                console.log('✅ Acceso de administrador concedido a:', user.email);
+                
+                // Actualizar localStorage (solo para UI, NO para seguridad)
+                // Esto es solo para que el header muestre el nombre del admin, no para verificar seguridad
+                localStorage.setItem('kairosUser', JSON.stringify({
+                    id: user.id,
+                    email: user.email,
+                    name: user.user_metadata?.name || 'Admin',
+                    loggedIn: true
+                }));
+                
+                return true;  // Indica que el usuario es admin y puede continuar
+                
+            } catch (error) {
+                console.error('Error al verificar admin:', error);
+                window.location.href = 'landing.html';
+                return false;
+            }
+        }
+        
+        // ============================================
+        // FUNCIONES DEL PANEL DE ADMIN
+        // ============================================
+        
+        async function iniciarPanelAdmin() {
+            // Actualizar UI con datos reales
+            const loginLink = document.getElementById('loginLink');
+            if (loginLink && adminUser) {
+                const nombreMostrar = adminUser.user_metadata?.name || 'ADMIN';
+                loginLink.innerHTML = `👤 ${nombreMostrar.toUpperCase()}`;
+                loginLink.href = "ajustes.html";
+            }
+            
+            document.getElementById('adminEmail').textContent = adminUser.email;
+            
+            let currentStatus = 'pending';
+            
+            function generateCouponCode(userName, photoId) {
+                const prefix = 'KAIROS';
+                const nameCode = userName.substring(0, 3).toUpperCase();
+                const random = Math.floor(Math.random() * 1000);
+                return `${prefix}-${nameCode}-${random}`;
+            }
+            
+            async function approvePhoto(id, userName) {
+                console.log('Aprobando foto ID:', id, 'Usuario:', userName);
+                const couponCode = generateCouponCode(userName, id);
+                
+                try {
+                    const { data: checkData, error: checkError } = await window.supabaseClient
+                        .from('fotos comunidad')
+                        .select('id, status')
+                        .eq('id', id)
+                        .single();
+                    
+                    if (checkError) {
+                        alert('Error: No se encontró la foto');
+                        return;
+                    }
+                    
+                    const { error } = await window.supabaseClient
+                        .from('fotos comunidad')
+                        .update({ status: 'approved', coupon_code: couponCode })
+                        .eq('id', id);
+                    
+                    if (error) throw error;
+                    
+                    alert(`✅ Foto aprobada!\n\nCupón: ${couponCode}\n\n(Guarda este código para dárselo al usuario)`);
+                    loadPhotos();
+                } catch (error) {
+                    alert('Error: ' + error.message);
+                }
+            }
+            
+            async function rejectPhoto(id) {
+                if (!confirm('¿Rechazar esta foto?')) return;
+                
+                try {
+                    const { error } = await window.supabaseClient
+                        .from('fotos comunidad')
+                        .update({ status: 'rejected' })
+                        .eq('id', id);
+                    
+                    if (error) throw error;
+                    alert('❌ Foto rechazada');
+                    loadPhotos();
+                } catch (error) {
+                    alert('Error: ' + error.message);
+                }
+            }
+            
+            async function loadPhotos() {
+                const container = document.getElementById('photosList');
+                container.innerHTML = '<div class="empty-message">Cargando fotos...</div>';
+                
+                try {
+                    const { data, error } = await window.supabaseClient
+                        .from('fotos comunidad')
+                        .select('*')
+                        .eq('status', currentStatus)
+                        .order('created_at', { ascending: false });
+                    
+                    if (error) throw error;
+                    
+                    if (!data || data.length === 0) {
+                        container.innerHTML = '<div class="empty-message">📸 No hay fotos en esta categoría</div>';
+                        return;
+                    }
+                    
+                    let html = '<table class="photos-table"><thead><tr><th>Foto</th><th>Usuario</th><th>Prenda</th><th>Historia</th><th>Estado</th><th>Acciones</th></tr></thead><tbody>';
+                    
+                    for (const photo of data) {
+                        const safeName = photo.user_name?.replace(/'/g, "\\'") || '';
+                        html += `
+                            <tr>
+                                <td><img src="${photo.image_url}" class="photo-preview" alt="" onerror="this.src='https://placehold.co/60x60/2a2a2a/666?text=Error'"></td>
+                                <td><strong>${escapeHtml(photo.user_name)}</strong><br><small>${photo.user_id?.substring(0, 8) || ''}...</small></td>
+                                <td>${escapeHtml(photo.product_name)}</td>
+                                <td>${photo.story ? escapeHtml(photo.story.substring(0, 60)) + (photo.story.length > 60 ? '...' : '') : '-'}</td>
+                                <td><span class="status-badge status-${photo.status}">${photo.status === 'pending' ? 'Pendiente' : photo.status === 'approved' ? 'Aprobada' : 'Rechazada'}</span></td>
+                                <td>
+                                    ${photo.status === 'pending' ? `
+                                        <button class="btn-approve" onclick="window.approvePhoto(${photo.id}, '${safeName}')">✅ Aprobar</button>
+                                        <button class="btn-reject" onclick="window.rejectPhoto(${photo.id})">❌ Rechazar</button>
+                                    ` : ''}
+                                    ${photo.status === 'approved' && photo.coupon_code ? `<span class="coupon-code">${photo.coupon_code}</span>` : ''}
+                                </td>
+                            </tr>
+                        `;
+                    }
+                    
+                    html += '</tbody></table>';
+                    container.innerHTML = html;
+                } catch (error) {
+                    container.innerHTML = '<div class="empty-message">❌ Error al cargar las fotos</div>';
+                }
+            }
+            
+            function escapeHtml(text) {
+                if (!text) return '';
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+            
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    currentStatus = tab.dataset.status;
+                    loadPhotos();
+                });
+            });
+            
+            window.approvePhoto = approvePhoto;
+            window.rejectPhoto = rejectPhoto;
+            
+            loadPhotos();
+        }
+        
+        // ============================================
+        // INICIO: Esperar a Supabase y verificar admin
+        // ============================================
+        
+        function esperarSupabaseYVerificar() {
+            if (!window.supabaseClient) {
+                setTimeout(esperarSupabaseYVerificar, 100);
+                return;
+            }
+            
+            verificarAdmin().then(esAdmin => {
+                if (esAdmin) {
+                    iniciarPanelAdmin();
+                }
+            });
+        }
+        
+        esperarSupabaseYVerificar();
+    </script>
+</body>
+</html>

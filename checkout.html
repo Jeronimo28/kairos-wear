@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout · Kairos Wear</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <style>
+        .checkout-wrapper {
+            max-width: 1000px;
+            margin: 110px auto 60px;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 3rem;
+            align-items: start;
+        }
+        @media (max-width: 800px) {
+            .checkout-wrapper {
+                grid-template-columns: 1fr;
+                margin-top: 100px;
+                padding: 0 1rem;
+            }
+            /* En móvil el resumen va arriba */
+            .order-summary { order: -1; }
+        }
+
+        /* ── FORMULARIO ── */
+        .checkout-form h1 {
+            font-size: 1.6rem;
+            margin-bottom: 2rem;
+            letter-spacing: -0.02em;
+        }
+        .form-section {
+            margin-bottom: 2rem;
+        }
+        .form-section h2 {
+            font-size: 0.85rem;
+            letter-spacing: 2px;
+            color: #b87c4f;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #2a2a2a;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        .form-row.full { grid-template-columns: 1fr; }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+        .form-group label {
+            font-size: 0.78rem;
+            color: #888;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .form-group input, .form-group select {
+            background: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            color: #e5e5e5;
+            padding: 0.75rem 1rem;
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            transition: border-color 0.2s;
+            width: 100%;
+        }
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #b87c4f;
+        }
+        .form-group input::placeholder { color: #555; }
+
+        /* ── PAGO ── */
+        .payment-demo {
+            background: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            border-radius: 6px;
+            padding: 1.5rem;
+        }
+        .payment-demo .demo-badge {
+            display: inline-block;
+            background: #ff9800;
+            color: #0a0a0a;
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 20px;
+            letter-spacing: 1px;
+            margin-bottom: 1rem;
+        }
+        .card-field-group {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .card-input-wrap {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+        .card-input-wrap label {
+            font-size: 0.78rem;
+            color: #888;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .card-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .card-input {
+            background: #0f0f0f;
+            border: 1px solid #2a2a2a;
+            color: #e5e5e5;
+            padding: 0.75rem 1rem;
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            transition: border-color 0.2s;
+            width: 100%;
+        }
+        .card-input:focus { outline: none; border-color: #b87c4f; }
+        .card-input::placeholder { color: #444; }
+
+        .stripe-note {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            font-size: 0.75rem;
+            color: #555;
+        }
+        .stripe-logo {
+            font-weight: 700;
+            color: #635bff;
+            font-size: 0.85rem;
+        }
+
+        /* ── CUPÓN ── */
+        .coupon-row {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        .coupon-row input {
+            flex: 1;
+            background: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            color: #e5e5e5;
+            padding: 0.7rem 1rem;
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+        }
+        .coupon-row input:focus { outline: none; border-color: #b87c4f; }
+        .btn-coupon {
+            background: #2a2a2a;
+            border: 1px solid #3a3a3a;
+            color: #e5e5e5;
+            padding: 0.7rem 1.2rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .btn-coupon:hover { background: #b87c4f; border-color: #b87c4f; color: #0a0a0a; }
+        .coupon-msg { font-size: 0.8rem; margin-top: 0.4rem; }
+        .coupon-ok { color: #4caf50; }
+        .coupon-err { color: #ff6b6b; }
+
+        /* ── BOTÓN PAGAR ── */
+        .btn-pay {
+            width: 100%;
+            padding: 1rem;
+            background: #b87c4f;
+            color: #0a0a0a;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            letter-spacing: 1px;
+            transition: background 0.2s;
+            margin-top: 1.5rem;
+        }
+        .btn-pay:hover { background: #9a623d; }
+        .btn-pay:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* ── RESUMEN ── */
+        .order-summary {
+            background: #111;
+            border: 1px solid #1f1f1f;
+            border-radius: 8px;
+            padding: 1.5rem;
+            position: sticky;
+            top: 100px;
+        }
+        .order-summary h2 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid #2a2a2a;
+        }
+        .summary-item {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            align-items: center;
+        }
+        .summary-item-img {
+            width: 56px;
+            height: 56px;
+            object-fit: cover;
+            border-radius: 4px;
+            background: #1a1a1a;
+            flex-shrink: 0;
+        }
+        .summary-item-info { flex: 1; }
+        .summary-item-name { font-size: 0.88rem; font-weight: 600; margin-bottom: 2px; }
+        .summary-item-meta { font-size: 0.78rem; color: #888; }
+        .summary-item-price { font-weight: 600; color: #b87c4f; font-size: 0.9rem; white-space: nowrap; }
+
+        .summary-divider { border: none; border-top: 1px solid #2a2a2a; margin: 1rem 0; }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.88rem;
+            margin-bottom: 0.5rem;
+            color: #b0b0b0;
+        }
+        .summary-row.discount { color: #4caf50; }
+        .summary-total {
+            display: flex;
+            justify-content: space-between;
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-top: 0.75rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid #2a2a2a;
+        }
+        .summary-total span:last-child { color: #b87c4f; }
+
+        /* ── SUCCESS ── */
+        .success-screen {
+            display: none;
+            text-align: center;
+            padding: 4rem 2rem;
+            max-width: 500px;
+            margin: 120px auto;
+        }
+        .success-screen .check { font-size: 4rem; margin-bottom: 1rem; }
+        .success-screen h2 { font-size: 1.8rem; margin-bottom: 1rem; }
+        .success-screen p { color: #b0b0b0; margin-bottom: 0.5rem; }
+        .success-screen .order-id {
+            background: #1a1a1a;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            font-family: monospace;
+            color: #b87c4f;
+            display: inline-block;
+            margin: 1rem 0;
+        }
+        .btn-back-shop {
+            display: inline-block;
+            margin-top: 1.5rem;
+            padding: 0.8rem 2rem;
+            background: #b87c4f;
+            color: #0a0a0a;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: 700;
+        }
+
+        /* ── ERROR / LOADING ── */
+        .pay-message {
+            margin-top: 0.75rem;
+            padding: 0.75rem 1rem;
+            border-radius: 4px;
+            font-size: 0.88rem;
+            text-align: center;
+        }
+        .pay-message.error { background: rgba(255,107,107,0.15); color: #ff6b6b; }
+        .pay-message.info  { background: rgba(184,124,79,0.15); color: #b87c4f; }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">
+                <a href="index.html">
+                    <img src="imagenes/logo.png" alt="Kairos" class="logo-img">
+                </a>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html">INICIO</a></li>
+                <li><a href="index.html#coleccion">COLECCIÓN</a></li>
+                <li><a href="comunidad.html">COMUNIDAD</a></li>
+                <li><a href="#" id="loginLink">MI CUENTA</a></li>
+            </ul>
+            <div class="cart-icon" id="cartIcon">
+                <span class="cart-icon-symbol">🛒</span>
+                <span class="cart-count" id="cartCount">0</span>
+            </div>
+        </nav>
+    </header>
+
+    <!-- ══ PANTALLA ÉXITO ══ -->
+    <div class="success-screen" id="successScreen">
+        <div class="check">✅</div>
+        <h2>¡Pedido confirmado!</h2>
+        <p>Gracias por tu compra. Recibirás un email con los detalles.</p>
+        <div class="order-id" id="orderId"></div>
+        <p style="font-size:0.85rem;color:#666;">Procesado en modo demo — integra Stripe para pagos reales</p>
+        <a href="index.html" class="btn-back-shop">SEGUIR COMPRANDO</a>
+    </div>
+
+    <!-- ══ CHECKOUT ══ -->
+    <div class="checkout-wrapper" id="checkoutWrapper">
+
+        <!-- FORMULARIO -->
+        <div class="checkout-form">
+            <h1>Finalizar pedido</h1>
+
+            <!-- Datos personales -->
+            <div class="form-section">
+                <h2>Datos personales</h2>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Nombre</label>
+                        <input type="text" id="firstName" placeholder="Javier" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Apellidos</label>
+                        <input type="text" id="lastName" placeholder="García" required>
+                    </div>
+                </div>
+                <div class="form-row full" style="margin-top:1rem">
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="email" placeholder="javier@email.com" required>
+                    </div>
+                </div>
+                <div class="form-row full" style="margin-top:1rem">
+                    <div class="form-group">
+                        <label>Teléfono</label>
+                        <input type="tel" id="phone" placeholder="+34 600 000 000">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dirección -->
+            <div class="form-section">
+                <h2>Dirección de envío</h2>
+                <div class="form-row full">
+                    <div class="form-group">
+                        <label>Dirección</label>
+                        <input type="text" id="address" placeholder="Calle Mayor 12, 3º B" required>
+                    </div>
+                </div>
+                <div class="form-row" style="margin-top:1rem">
+                    <div class="form-group">
+                        <label>Ciudad</label>
+                        <input type="text" id="city" placeholder="Madrid" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Código postal</label>
+                        <input type="text" id="postalCode" placeholder="28001" required>
+                    </div>
+                </div>
+                <div class="form-row full" style="margin-top:1rem">
+                    <div class="form-group">
+                        <label>País</label>
+                        <select id="country">
+                            <option value="ES">España</option>
+                            <option value="MX">México</option>
+                            <option value="AR">Argentina</option>
+                            <option value="CO">Colombia</option>
+                            <option value="CL">Chile</option>
+                            <option value="US">Estados Unidos</option>
+                            <option value="OTHER">Otro</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cupón -->
+            <div class="form-section">
+                <h2>Cupón de descuento</h2>
+                <div class="coupon-row">
+                    <input type="text" id="couponInput" placeholder="KAIROS-XXX-000">
+                    <button class="btn-coupon" id="applyCouponBtn">APLICAR</button>
+                </div>
+                <div class="coupon-msg" id="couponMsg"></div>
+            </div>
+
+            <!-- Pago -->
+            <div class="form-section">
+                <h2>Pago</h2>
+                <div class="payment-demo">
+                    <span class="demo-badge">MODO DEMO</span>
+                    <p style="font-size:0.82rem;color:#666;margin-bottom:1rem;">
+                        Cuando tengas las claves de Stripe, reemplaza estas líneas por el componente oficial.
+                        <a href="https://stripe.com" target="_blank" style="color:#635bff">Crear cuenta →</a>
+                    </p>
+                    <div class="card-field-group">
+                        <div class="card-input-wrap">
+                            <label>Número de tarjeta</label>
+                            <input class="card-input" type="text" id="cardNumber"
+                                placeholder="4242 4242 4242 4242" maxlength="19"
+                                oninput="formatCard(this)">
+                        </div>
+                        <div class="card-row">
+                            <div class="card-input-wrap">
+                                <label>Caducidad</label>
+                                <input class="card-input" type="text" id="cardExpiry"
+                                    placeholder="MM / AA" maxlength="7"
+                                    oninput="formatExpiry(this)">
+                            </div>
+                            <div class="card-input-wrap">
+                                <label>CVC</label>
+                                <input class="card-input" type="text" id="cardCVC"
+                                    placeholder="123" maxlength="4">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="stripe-note">
+                        🔒 Pagos seguros con <span class="stripe-logo">stripe</span> (demo — no se realizan cargos reales)
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn-pay" id="payBtn">PAGAR AHORA</button>
+            <div class="pay-message" id="payMessage" style="display:none"></div>
+        </div>
+
+        <!-- RESUMEN DEL PEDIDO -->
+        <aside class="order-summary">
+            <h2>Tu pedido</h2>
+            <div id="summaryItems"></div>
+            <hr class="summary-divider">
+            <div class="summary-row">
+                <span>Subtotal</span>
+                <span id="summarySubtotal">0€</span>
+            </div>
+            <div class="summary-row">
+                <span>Envío</span>
+                <span id="summaryShipping">3,99€</span>
+            </div>
+            <div class="summary-row discount" id="discountRow" style="display:none">
+                <span>Descuento (<span id="discountPct"></span>)</span>
+                <span id="discountAmt"></span>
+            </div>
+            <div class="summary-total">
+                <span>Total</span>
+                <span id="summaryTotal">0€</span>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Modal carrito (oculto en checkout pero necesario para JS) -->
+    <div id="cartModal" class="modal" style="display:none">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3>🛒 Tu carrito</h3>
+            <div id="cartItems"></div>
+            <div class="cart-total"><strong>Total: <span id="cartTotal">0</span>€</strong></div>
+            <button id="checkoutBtn" class="btn-checkout">FINALIZAR PEDIDO</button>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-logo">KAIROS WEAR</div>
+            <p class="footer-tagline">El momento oportuno</p>
+            <div class="social-links">
+                <a href="#">Instagram</a>
+                <a href="#">Twitter</a>
+                <a href="#">TikTok</a>
+            </div>
+            <p class="copyright">© 2026 Kairos Wear. Todos los momentos.</p>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+    <script src="js/supabase.js"></script>
+
+    <script>
+        // ══════════════════════════════════════════════
+        // STRIPE — CUANDO TENGAS LAS CLAVES:
+        // 1. Borra el bloque "MODO DEMO" del HTML
+        // 2. Añade: <script src="https://js.stripe.com/v3/"></script>
+        // 3. Descomenta y rellena la línea de abajo:
+        // const stripe = Stripe('pk_live_TU_CLAVE_PUBLICA');
+        // const elements = stripe.elements();
+        // const cardElement = elements.create('card', { style: stripeStyle });
+        // cardElement.mount('#card-element');
+        // ══════════════════════════════════════════════
+
+        // Usuario
+        const user = JSON.parse(localStorage.getItem('kairosUser'));
+        const loginLink = document.getElementById('loginLink');
+        if (user && user.loggedIn) {
+            if (loginLink) { loginLink.innerHTML = `👤 ${user.name.toUpperCase()}`; loginLink.href = 'ajustes.html'; }
+            // Pre-rellenar email
+            const emailInput = document.getElementById('email');
+            if (emailInput) emailInput.value = user.email;
+        } else {
+            if (loginLink) { loginLink.innerHTML = 'INICIAR SESIÓN'; loginLink.href = 'login.html'; }
+        }
+
+        // ── CUPONES VÁLIDOS (añade los que generes en admin) ──
+        const VALID_COUPONS = {
+            // 'KAIROS-JVR-042': 15,  // 15% descuento
+            // 'KAIROS-MAR-217': 10,
+        };
+
+        let appliedCoupon = null;
+
+        // Formatear número de tarjeta (demo)
+        function formatCard(input) {
+            let v = input.value.replace(/\D/g, '').substring(0, 16);
+            input.value = v.replace(/(.{4})/g, '$1 ').trim();
+        }
+        function formatExpiry(input) {
+            let v = input.value.replace(/\D/g, '').substring(0, 4);
+            if (v.length >= 3) v = v.substring(0,2) + ' / ' + v.substring(2);
+            input.value = v;
+        }
+
+        // ── RENDER RESUMEN ──
+        function renderSummary() {
+            const cart = JSON.parse(localStorage.getItem('kairosCart') || '[]');
+            const container = document.getElementById('summaryItems');
+            const SHIPPING = 3.99;
+
+            if (!cart.length) {
+                container.innerHTML = '<p style="color:#888;font-size:0.85rem">El carrito está vacío</p>';
+                return;
+            }
+
+            const products = [
+                { id:1, image:'imagenes/Camiseta_logo2.png' },
+                { id:2, image:'imagenes/Camiseta_logo1.png' },
+                { id:3, image:'imagenes/sudadera-gris.jpg' },
+                { id:4, image:'imagenes/camisa-azul.jpg' }
+            ];
+
+            container.innerHTML = cart.map(item => {
+                const p = products.find(x => x.id === item.id) || {};
+                return `
+                <div class="summary-item">
+                    <img class="summary-item-img"
+                        src="${p.image || ''}"
+                        onerror="this.src='https://placehold.co/56x56/1a1a1a/666?text=K'"
+                        alt="${item.name}">
+                    <div class="summary-item-info">
+                        <div class="summary-item-name">${item.name}</div>
+                        <div class="summary-item-meta">Talla ${item.size} · x${item.quantity}</div>
+                    </div>
+                    <div class="summary-item-price">${item.price * item.quantity}€</div>
+                </div>`;
+            }).join('');
+
+            const subtotal = cart.reduce((s, i) => s + i.price * i.quantity, 0);
+            document.getElementById('summarySubtotal').textContent = subtotal.toFixed(2) + '€';
+
+            let discount = 0;
+            if (appliedCoupon) {
+                discount = subtotal * appliedCoupon.pct / 100;
+                document.getElementById('discountRow').style.display = 'flex';
+                document.getElementById('discountPct').textContent = appliedCoupon.pct + '%';
+                document.getElementById('discountAmt').textContent = '−' + discount.toFixed(2) + '€';
+            } else {
+                document.getElementById('discountRow').style.display = 'none';
+            }
+
+            const shipping = subtotal >= 50 ? 0 : SHIPPING;
+            document.getElementById('summaryShipping').textContent = shipping === 0 ? 'GRATIS' : shipping.toFixed(2) + '€';
+            document.getElementById('summaryTotal').textContent = (subtotal - discount + shipping).toFixed(2) + '€';
+        }
+
+        // ── CUPÓN ──
+        document.getElementById('applyCouponBtn').addEventListener('click', () => {
+            const code = document.getElementById('couponInput').value.trim().toUpperCase();
+            const msgEl = document.getElementById('couponMsg');
+
+            if (!code) { msgEl.innerHTML = '<span class="coupon-err">Introduce un código</span>'; return; }
+
+            // Comprobar en lista local (y en Supabase si quieres ampliarlo)
+            if (VALID_COUPONS[code] !== undefined) {
+                appliedCoupon = { code, pct: VALID_COUPONS[code] };
+                msgEl.innerHTML = `<span class="coupon-ok">✅ Cupón aplicado: ${appliedCoupon.pct}% de descuento</span>`;
+                renderSummary();
+            } else {
+                appliedCoupon = null;
+                msgEl.innerHTML = '<span class="coupon-err">❌ Cupón no válido o ya usado</span>';
+                renderSummary();
+            }
+        });
+
+        // ── VALIDACIÓN BÁSICA ──
+        function validateForm() {
+            const fields = ['firstName','lastName','email','address','city','postalCode'];
+            for (const f of fields) {
+                if (!document.getElementById(f).value.trim()) return false;
+            }
+            return true;
+        }
+
+        // ── PAGO (MODO DEMO) ──
+        document.getElementById('payBtn').addEventListener('click', async () => {
+            if (!validateForm()) {
+                showPayMessage('Por favor completa todos los campos obligatorios', 'error');
+                return;
+            }
+
+            const cart = JSON.parse(localStorage.getItem('kairosCart') || '[]');
+            if (!cart.length) {
+                showPayMessage('Tu carrito está vacío', 'error');
+                return;
+            }
+
+            const payBtn = document.getElementById('payBtn');
+            payBtn.disabled = true;
+            payBtn.textContent = 'PROCESANDO...';
+            showPayMessage('Verificando pedido...', 'info');
+
+            // ══ AQUÍ irá la llamada real a Stripe cuando tengas las claves ══
+            // Simulamos 2s de procesamiento
+            await new Promise(r => setTimeout(r, 2000));
+
+            // Guardar pedido en Supabase (si usuario logueado)
+            const orderId = 'KW-' + Date.now().toString(36).toUpperCase();
+
+            if (user && user.loggedIn && window.supabaseClient) {
+                try {
+                    await window.supabaseClient.from('pedidos').insert({
+                        user_id: user.id,
+                        order_id: orderId,
+                        items: cart,
+                        total: parseFloat(document.getElementById('summaryTotal').textContent),
+                        shipping_name: document.getElementById('firstName').value + ' ' + document.getElementById('lastName').value,
+                        shipping_address: document.getElementById('address').value,
+                        shipping_city: document.getElementById('city').value,
+                        shipping_postal: document.getElementById('postalCode').value,
+                        shipping_country: document.getElementById('country').value,
+                        email: document.getElementById('email').value,
+                        coupon: appliedCoupon ? appliedCoupon.code : null,
+                        status: 'demo'
+                    });
+                } catch(e) {
+                    // Tabla puede no existir aún — no bloquea el flujo
+                    console.log('Tabla pedidos no encontrada (crea en Supabase si quieres historiales):', e.message);
+                }
+            }
+
+            // Limpiar carrito y mostrar éxito
+            localStorage.removeItem('kairosCart');
+            document.getElementById('orderId').textContent = orderId;
+            document.getElementById('checkoutWrapper').style.display = 'none';
+            document.getElementById('successScreen').style.display = 'block';
+        });
+
+        function showPayMessage(msg, type) {
+            const el = document.getElementById('payMessage');
+            el.style.display = 'block';
+            el.className = `pay-message ${type}`;
+            el.textContent = msg;
+        }
+
+        // Init
+        renderSummary();
+    </script>
+</body>
+</html>

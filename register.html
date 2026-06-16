@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro · Kairos Wear</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <style>
+        .register-container {
+            max-width: 400px;
+            margin: 150px auto;
+            padding: 2rem;
+            background: #1a1a1a;
+            border-radius: 8px;
+        }
+        .register-container h1 {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+        .register-form input {
+            width: 100%;
+            padding: 0.8rem;
+            margin-bottom: 1rem;
+            background: #2a2a2a;
+            border: 1px solid #3a3a3a;
+            color: #e5e5e5;
+            border-radius: 4px;
+        }
+        .register-form button[type="submit"] {
+            width: 100%;
+            padding: 0.8rem;
+            background: #b87c4f;
+            color: #0a0a0a;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .error-message {
+            color: #ff6b6b;
+            text-align: center;
+            margin-top: 1rem;
+        }
+        .success-message {
+            color: #4caf50;
+            text-align: center;
+            margin-top: 1rem;
+        }
+        .login-link {
+            text-align: center;
+            margin-top: 1rem;
+            color: #b0b0b0;
+        }
+        .login-link a {
+            color: #b87c4f;
+            text-decoration: none;
+        }
+        .loading {
+            text-align: center;
+            margin-top: 1rem;
+            color: #b87c4f;
+        }
+        .password-wrapper {
+            position: relative;
+            margin-bottom: 1rem;
+            width: 100%;
+        }
+        .password-wrapper input {
+            width: 100%;
+            padding: 0.8rem;
+            padding-right: 45px;
+            margin-bottom: 0;
+        }
+        .toggle-password {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #b87c4f;
+            cursor: pointer;
+            font-size: 1.2rem;
+            padding: 0;
+            margin: 0;
+        }
+        .toggle-password:hover {
+            color: #9a623d;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">
+                <a href="landing.html">
+                    <span class="logo-text">KAIROS WEAR</span>
+                </a>
+            </div>
+            <ul class="nav-links">
+                <li><a href="landing.html">INICIO</a></li>
+                <li><a href="index.html#coleccion">COLECCIÓN</a></li>
+                <li><a href="index.html#filosofia">FILOSOFÍA</a></li>
+                <li><a href="login.html">INICIAR SESIÓN</a></li>
+            </ul>
+            <div class="cart-icon" id="cartIcon">
+                <span class="cart-icon-symbol">🛒</span>
+                <span class="cart-count" id="cartCount">0</span>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <div class="register-container">
+            <h1>Crear cuenta</h1>
+            <form id="registerForm" class="register-form">
+                <input type="text" id="name" placeholder="Nombre completo" required>
+                <input type="email" id="email" placeholder="Email" required>
+                
+                <div class="password-wrapper">
+                    <input type="password" id="password" placeholder="Contraseña (mínimo 6 caracteres)" required>
+                    <button type="button" class="toggle-password" id="togglePassword">👁️</button>
+                </div>
+                
+                <button type="submit">REGISTRARSE</button>
+            </form>
+            <div id="message"></div>
+            <div class="login-link">
+                ¿Ya tienes cuenta? <a href="login.html">Inicia sesión</a>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-logo">KAIROS WEAR</div>
+            <p class="footer-tagline">El momento oportuno</p>
+            <div class="social-links">
+                <a href="#">Instagram</a>
+                <a href="#">Twitter</a>
+                <a href="#">TikTok</a>
+            </div>
+            <p class="copyright">© 2026 Kairos Wear. Todos los momentos.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+    <script src="js/supabase.js"></script>
+    
+    <script>
+        // Mostrar/ocultar contraseña
+        const togglePassword = document.getElementById('togglePassword');
+        const passwordInput = document.getElementById('password');
+        
+        if (togglePassword && passwordInput) {
+            togglePassword.addEventListener('click', function() {
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+                this.textContent = type === 'password' ? '👁️' : '🙈';
+            });
+        }
+        
+        const form = document.getElementById('registerForm');
+        const messageDiv = document.getElementById('message');
+        
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            if (password.length < 6) {
+                messageDiv.innerHTML = '<div class="error-message">La contraseña debe tener al menos 6 caracteres</div>';
+                return;
+            }
+            
+            messageDiv.innerHTML = '<div class="loading">Creando cuenta...</div>';
+            
+            try {
+                const { data, error } = await window.supabaseClient.auth.signUp({
+                    email: email,
+                    password: password,
+                    options: {
+                        data: {
+                            name: name
+                        }
+                    }
+                });
+                
+                if (error) {
+                    messageDiv.innerHTML = `<div class="error-message">${error.message}</div>`;
+                    return;
+                }
+                
+                if (data.user) {
+                    messageDiv.innerHTML = '<div class="success-message">¡Cuenta creada! Ahora inicia sesión.</div>';
+                    
+                    setTimeout(() => {
+                        window.location.href = 'login.html';
+                    }, 2000);
+                }
+            } catch (err) {
+                messageDiv.innerHTML = `<div class="error-message">Error: ${err.message}</div>`;
+            }
+        });
+    </script>
+</body>
+</html>

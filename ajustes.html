@@ -1,0 +1,1239 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ajustes · Kairos Wear</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <style>
+        .settings-container {
+            max-width: 600px;
+            margin: 120px auto 60px;
+            padding: 2rem;
+            background: #1a1a1a;
+            border-radius: 8px;
+        }
+        .settings-container h1 {
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        .settings-section {
+            margin-bottom: 2rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid #2a2a2a;
+        }
+        .settings-section h2 {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            color: #b87c4f;
+        }
+        .settings-section .section-desc {
+            font-size: 0.85rem;
+            color: #888;
+            margin-bottom: 1rem;
+        }
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.8rem 0;
+            border-bottom: 1px solid #2a2a2a;
+        }
+        .info-row:last-child {
+            border-bottom: none;
+        }
+        .info-label {
+            font-weight: 600;
+            color: #b0b0b0;
+        }
+        .info-value {
+            color: #e5e5e5;
+        }
+        .info-sub {
+            font-size: 0.75rem;
+            color: #666;
+        }
+        .btn-settings {
+            background: #2a2a2a;
+            color: #e5e5e5;
+            border: 1px solid #3a3a3a;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.3s;
+        }
+        .btn-settings:hover {
+            background: #b87c4f;
+            border-color: #b87c4f;
+            color: #0a0a0a;
+        }
+        .btn-success {
+            background: #4caf50;
+            border-color: #4caf50;
+            color: white;
+        }
+        .btn-success:hover {
+            background: #45a049;
+        }
+        .btn-danger {
+            background: #2a1a1a;
+            border-color: #8b4c4c;
+            color: #ff6b6b;
+        }
+        .btn-danger:hover {
+            background: #8b4c4c;
+            color: #0a0a0a;
+        }
+        .back-link {
+            display: inline-block;
+            margin-top: 1rem;
+            color: #b87c4f;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        .mfa-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .mfa-badge {
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+        .mfa-badge.active {
+            background: #4caf50;
+            color: white;
+        }
+        .mfa-badge.inactive {
+            background: #666;
+            color: white;
+        }
+        .mfa-radio-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+            align-items: flex-end;
+        }
+        .mfa-radio-group label {
+            font-size: 0.85rem;
+            color: #e5e5e5;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .mfa-radio-group label input[type="radio"] {
+            accent-color: #b87c4f;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+        }
+        .modal-content {
+            background-color: #1a1a1a;
+            margin: 10% auto;
+            padding: 2rem;
+            width: 90%;
+            max-width: 450px;
+            border-radius: 8px;
+            position: relative;
+        }
+        .modal-content h3 {
+            margin-bottom: 1rem;
+            color: #b87c4f;
+        }
+        .modal-content p {
+            color: #b0b0b0;
+            font-size: 0.9rem;
+        }
+        .modal-content input {
+            width: 100%;
+            padding: 0.8rem;
+            margin-bottom: 1rem;
+            background: #2a2a2a;
+            border: 1px solid #3a3a3a;
+            color: #e5e5e5;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .modal-content button {
+            width: 100%;
+            padding: 0.8rem;
+            background: #b87c4f;
+            color: #0a0a0a;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+        .modal-content button:hover {
+            background: #9a623d;
+        }
+        .modal-content button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .close-modal {
+            position: absolute;
+            right: 1rem;
+            top: 0.5rem;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #888;
+        }
+        .close-modal:hover {
+            color: #b87c4f;
+        }
+        .modal-message {
+            margin-top: 1rem;
+            padding: 0.5rem;
+            border-radius: 4px;
+            text-align: center;
+            font-size: 0.85rem;
+        }
+        .modal-message.success {
+            background: rgba(76, 175, 80, 0.2);
+            color: #4caf50;
+        }
+        .modal-message.error {
+            background: rgba(255, 107, 107, 0.2);
+            color: #ff6b6b;
+        }
+        .modal-message.info {
+            background: rgba(184, 124, 79, 0.2);
+            color: #b87c4f;
+        }
+        .password-wrapper {
+            position: relative;
+            margin-bottom: 1rem;
+            width: 100%;
+        }
+        .password-wrapper input {
+            width: 100%;
+            padding: 0.8rem;
+            padding-right: 40px;
+            margin-bottom: 0;
+            box-sizing: border-box;
+        }
+        .toggle-password-modal {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none !important;
+            border: none !important;
+            color: #b87c4f;
+            cursor: pointer;
+            font-size: 1.2rem;
+            width: 30px !important;
+            height: 30px !important;
+            display: flex !important;
+            align-items: center;
+            justify-content: center;
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+        .toggle-password-modal:hover {
+            color: #9a623d;
+            background: none !important;
+        }
+        .qr-code {
+            text-align: center;
+            margin: 1rem 0;
+        }
+        .qr-code img {
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+        }
+        .mfa-modal-input {
+            text-align: center;
+            font-size: 1.5rem;
+            letter-spacing: 4px;
+        }
+        .loading-spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #0a0a0a;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+            margin-right: 8px;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        /* Biometría */
+        .biometric-status {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+        .biometric-status .btn-settings {
+            min-width: 100px;
+        }
+        .biometric-icon {
+            font-size: 1.5rem;
+        }
+        .compatibility-note {
+            font-size: 0.7rem;
+            color: #666;
+            margin-top: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">
+                <a href="index.html">
+                    <img src="imagenes/logo.png" alt="Kairos" class="logo-img">
+                </a>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html">INICIO</a></li>
+                <li><a href="index.html#coleccion">COLECCIÓN</a></li>
+                <li><a href="comunidad.html">COMUNIDAD</a></li>
+                <li><a href="#" id="loginLink">INICIAR SESIÓN</a></li>
+            </ul>
+            <div class="cart-icon" id="cartIcon">
+                <span class="cart-icon-symbol">🛒</span>
+                <span class="cart-count" id="cartCount">0</span>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <div class="settings-container">
+            <h1>⚙️ Ajustes de cuenta</h1>
+            
+            <!-- ===== SECCIÓN INFORMACIÓN PERSONAL ===== -->
+            <div class="settings-section">
+                <h2>👤 Información personal</h2>
+                <div class="info-row">
+                    <span class="info-label">Nombre:</span>
+                    <span class="info-value" id="profileName">-</span>
+                    <button class="btn-settings" id="editNameBtn">Cambiar</button>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Email:</span>
+                    <span class="info-value" id="profileEmail">-</span>
+                    <button class="btn-settings" id="editEmailBtn">Cambiar</button>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Contraseña:</span>
+                    <span class="info-value">••••••••</span>
+                    <button class="btn-settings" id="editPasswordBtn">Cambiar</button>
+                </div>
+            </div>
+            
+            <!-- ===== SECCIÓN MÉTODOS DE AUTENTICACIÓN ===== -->
+            <div class="settings-section">
+                <h2>🔐 Métodos de autenticación</h2>
+                <p class="section-desc">Elige cómo quieres verificar tu identidad al iniciar sesión o realizar cambios sensibles.</p>
+                
+                <!-- Opción 1: Código 6 dígitos (TOTP) -->
+                <div class="info-row">
+                    <div>
+                        <span class="info-label">📱 Código de 6 dígitos</span>
+                        <br>
+                        <span class="info-sub">Google Authenticator, Authy, etc.</span>
+                    </div>
+                    <div class="mfa-status">
+                        <span id="totpStatus" class="mfa-badge inactive">❌ Inactivo</span>
+                        <button class="btn-settings" id="totpSetupBtn">Configurar</button>
+                    </div>
+                </div>
+                
+                <!-- Opción 2: Biométrica -->
+                <div class="info-row">
+                    <div>
+                        <span class="info-label">🖐️ Autenticación biométrica</span>
+                        <br>
+                        <span class="info-sub">Huella dactilar, Face ID, Windows Hello</span>
+                    </div>
+                    <div class="mfa-status">
+                        <span id="biometricStatus" class="mfa-badge inactive">❌ Inactivo</span>
+                        <button class="btn-settings" id="biometricSetupBtn">Configurar</button>
+                    </div>
+                </div>
+                
+                <!-- Modo de verificación -->
+                <div class="info-row" style="border-bottom: none; padding-top: 1rem;">
+                    <div>
+                        <span class="info-label">⚙️ Modo de verificación</span>
+                        <br>
+                        <span class="info-sub">¿Qué método quieres usar al iniciar sesión?</span>
+                    </div>
+                    <div class="mfa-radio-group">
+                        <label>
+                            <input type="radio" name="mfaMode" value="totp"> Solo código 6 dígitos
+                        </label>
+                        <label>
+                            <input type="radio" name="mfaMode" value="biometric"> Solo biométrica
+                        </label>
+                        <label>
+                            <input type="radio" name="mfaMode" value="both"> Ambos (máxima seguridad)
+                        </label>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- ===== SECCIÓN SESIÓN ===== -->
+            <div class="settings-section">
+                <h2>🚪 Sesión</h2>
+                <button class="btn-settings btn-danger" id="logoutBtn">Cerrar sesión</button>
+            </div>
+            
+            <a href="index.html" class="back-link">← Volver a la tienda</a>
+        </div>
+    </main>
+
+    <!-- ===== MODALES ===== -->
+
+    <!-- Modal Cambiar Nombre -->
+    <div id="modalName" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h3>Cambiar nombre</h3>
+            <input type="text" id="newName" placeholder="Nuevo nombre">
+            <button id="saveNameBtn">Guardar</button>
+            <div id="nameMessage" class="modal-message"></div>
+        </div>
+    </div>
+
+    <!-- Modal Cambiar Email -->
+    <div id="modalEmail" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h3>Cambiar email</h3>
+            <input type="email" id="newEmail" placeholder="Nuevo email">
+            <div class="password-wrapper">
+                <input type="password" id="emailPassword" placeholder="Contraseña actual (obligatoria)">
+                <button type="button" class="toggle-password-modal" id="toggleEmailPwd">👁️</button>
+            </div>
+            <button id="saveEmailBtn">Guardar</button>
+            <div id="emailMessage" class="modal-message"></div>
+        </div>
+    </div>
+
+    <!-- Modal Cambiar Contraseña -->
+    <div id="modalPassword" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h3>Cambiar contraseña</h3>
+            <div class="password-wrapper">
+                <input type="password" id="currentPassword" placeholder="Contraseña actual">
+                <button type="button" class="toggle-password-modal" id="toggleCurrentPwd">👁️</button>
+            </div>
+            <div class="password-wrapper">
+                <input type="password" id="newPassword" placeholder="Nueva contraseña (mínimo 6 caracteres)">
+                <button type="button" class="toggle-password-modal" id="toggleNewPwd">👁️</button>
+            </div>
+            <div class="password-wrapper">
+                <input type="password" id="confirmPassword" placeholder="Confirmar nueva contraseña">
+                <button type="button" class="toggle-password-modal" id="toggleConfirmPwd">👁️</button>
+            </div>
+            <button id="savePasswordBtn">Guardar</button>
+            <div id="passwordMessage" class="modal-message"></div>
+        </div>
+    </div>
+
+    <!-- Modal Configurar 2FA (TOTP) -->
+    <div id="modalMFA" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h3 id="mfaModalTitle">Configurar 2FA</h3>
+            <div id="mfaStep1">
+                <p>1. Escanea este código QR con Google Authenticator:</p>
+                <div id="qrCodeContainer" class="qr-code"></div>
+                <p>2. Introduce el código de 6 dígitos:</p>
+                <input type="text" id="mfaCode" placeholder="Código de 6 dígitos" maxlength="6">
+                <button id="verifyMfaBtn">Verificar y activar</button>
+            </div>
+            <div id="mfaMessage" class="modal-message"></div>
+        </div>
+    </div>
+
+    <!-- Modal Configurar Biometría -->
+    <div id="modalBiometric" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h3>🖐️ Configurar autenticación biométrica</h3>
+            <div id="biometricStep1">
+                <p>1. Asegúrate de tener tu huella o Face ID configurado en tu dispositivo.</p>
+                <p style="font-size:0.85rem; color:#888; margin:0.5rem 0;">2. Haz clic en el botón para registrar tu huella o rostro.</p>
+                <div id="biometricStatusMsg" class="modal-message" style="margin-top:0.5rem;"></div>
+                <button id="registerBiometricBtn" style="margin-top:1rem;">🔐 Registrar biometría</button>
+            </div>
+            <div id="biometricMessage" class="modal-message"></div>
+        </div>
+    </div>
+
+    <!-- Modal 2FA para cambios sensibles -->
+    <div id="modal2FASensitive" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h3>🔐 Verificación en dos pasos</h3>
+            <p style="margin-bottom: 1rem; color: #b0b0b0;">Introduce el código de 6 dígitos de Google Authenticator</p>
+            <input type="text" id="sensitiveMfaCode" placeholder="000000" class="mfa-modal-input" maxlength="6" autocomplete="off">
+            <button id="verifySensitiveMfaBtn">Verificar y continuar</button>
+            <div id="sensitiveMfaMessage" class="modal-message"></div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-logo">KAIROS WEAR</div>
+            <p class="footer-tagline">El momento oportuno</p>
+            <div class="social-links">
+                <a href="#">Instagram</a>
+                <a href="#">Twitter</a>
+                <a href="#">TikTok</a>
+            </div>
+            <p class="copyright">© 2026 Kairos Wear. Todos los momentos.</p>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+    <script src="js/supabase.js"></script>
+    <script src="js/biometric-auth.js"></script>
+    
+    <script>
+        // ============================================
+        // CONFIGURACIÓN INICIAL
+        // ============================================
+        const currentUser = JSON.parse(localStorage.getItem('kairosUser'));
+        const loginLink = document.getElementById('loginLink');
+        
+        if (!currentUser || !currentUser.loggedIn) {
+            window.location.href = 'landing.html';
+        }
+        
+        if (loginLink) {
+            loginLink.innerHTML = `👤 ${currentUser.name.toUpperCase()}`;
+            loginLink.href = "ajustes.html";
+        }
+        
+        document.getElementById('profileName').textContent = currentUser.name;
+        document.getElementById('profileEmail').textContent = currentUser.email;
+        
+        // ============================================
+        // VARIABLES Y REFERENCIAS
+        // ============================================
+        const modalName = document.getElementById('modalName');
+        const modalEmail = document.getElementById('modalEmail');
+        const modalPassword = document.getElementById('modalPassword');
+        const modalMFA = document.getElementById('modalMFA');
+        const modalBiometric = document.getElementById('modalBiometric');
+        const modal2FASensitive = document.getElementById('modal2FASensitive');
+        
+        let userMFAPreferences = {
+            totpEnabled: false,
+            biometricEnabled: false,
+            mode: 'totp'
+        };
+        
+        // Variables para acciones pendientes (cambios sensibles)
+        let pendingActionCallback = null;
+        let pendingActionData = null;
+        
+        // ============================================
+        // FUNCIONES DE UTILIDAD
+        // ============================================
+        function closeModals() {
+            modalName.style.display = 'none';
+            modalEmail.style.display = 'none';
+            modalPassword.style.display = 'none';
+            modalMFA.style.display = 'none';
+            modalBiometric.style.display = 'none';
+            modal2FASensitive.style.display = 'none';
+            document.getElementById('sensitiveMfaCode').value = '';
+            document.getElementById('sensitiveMfaMessage').innerHTML = '';
+        }
+        
+        document.querySelectorAll('.close-modal').forEach(btn => {
+            btn.onclick = closeModals;
+        });
+        
+        window.onclick = (e) => {
+            if (e.target === modalName) closeModals();
+            if (e.target === modalEmail) closeModals();
+            if (e.target === modalPassword) closeModals();
+            if (e.target === modalMFA) closeModals();
+            if (e.target === modalBiometric) closeModals();
+            if (e.target === modal2FASensitive) closeModals();
+        };
+        
+        // ============================================
+        // CARGAR PREFERENCIAS MFA
+        // ============================================
+        async function loadMFAPreferences() {
+            try {
+                const { data, error } = await window.supabaseClient
+                    .from('user_mfa_preferences')
+                    .select('*')
+                    .eq('user_id', currentUser.id)
+                    .single();
+                
+                if (error && error.code !== 'PGRST116') {
+                    console.error('Error cargando preferencias:', error);
+                    return;
+                }
+                
+                if (data) {
+                    userMFAPreferences = {
+                        totpEnabled: data.totp_enabled || false,
+                        biometricEnabled: data.biometric_enabled || false,
+                        mode: data.mode || 'totp'
+                    };
+                    
+                    // Si tiene biometría guardada, actualizar localStorage
+                    if (data.biometric_credential_id) {
+                        localStorage.setItem('biometric_credential', JSON.stringify({
+                            id: data.biometric_credential_id,
+                            rawId: data.biometric_credential_id
+                        }));
+                    }
+                    
+                    updateUIForMFAPreferences();
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+        
+        // ============================================
+        // GUARDAR PREFERENCIAS MFA
+        // ============================================
+        async function saveMFAPreferences() {
+            try {
+                let bioCredentialId = null;
+                const savedCredential = JSON.parse(localStorage.getItem('biometric_credential') || 'null');
+                if (savedCredential) {
+                    bioCredentialId = savedCredential.id;
+                }
+                
+                const { error } = await window.supabaseClient
+                    .from('user_mfa_preferences')
+                    .upsert({
+                        user_id: currentUser.id,
+                        totp_enabled: userMFAPreferences.totpEnabled,
+                        biometric_enabled: userMFAPreferences.biometricEnabled,
+                        mode: userMFAPreferences.mode,
+                        biometric_credential_id: bioCredentialId,
+                        updated_at: new Date().toISOString()
+                    });
+                
+                if (error) throw error;
+                
+                console.log('Preferencias MFA guardadas:', userMFAPreferences);
+            } catch (error) {
+                console.error('Error guardando preferencias:', error);
+            }
+        }
+        
+        // ============================================
+        // ACTUALIZAR UI
+        // ============================================
+        function updateUIForMFAPreferences() {
+            // Badge TOTP
+            const totpBadge = document.getElementById('totpStatus');
+            if (totpBadge) {
+                if (userMFAPreferences.totpEnabled) {
+                    totpBadge.textContent = '✅ Activo';
+                    totpBadge.className = 'mfa-badge active';
+                } else {
+                    totpBadge.textContent = '❌ Inactivo';
+                    totpBadge.className = 'mfa-badge inactive';
+                }
+            }
+            
+            // Badge Biometría
+            const bioBadge = document.getElementById('biometricStatus');
+            if (bioBadge) {
+                if (userMFAPreferences.biometricEnabled) {
+                    bioBadge.textContent = '✅ Activo';
+                    bioBadge.className = 'mfa-badge active';
+                } else {
+                    bioBadge.textContent = '❌ Inactivo';
+                    bioBadge.className = 'mfa-badge inactive';
+                }
+            }
+            
+            // Radio buttons
+            document.querySelectorAll('input[name="mfaMode"]').forEach(radio => {
+                radio.checked = radio.value === userMFAPreferences.mode;
+                radio.disabled = !userMFAPreferences.totpEnabled && !userMFAPreferences.biometricEnabled;
+            });
+        }
+        
+        // ============================================
+        // EVENTOS: MFA MODE
+        // ============================================
+        document.querySelectorAll('input[name="mfaMode"]').forEach(radio => {
+            radio.addEventListener('change', async function() {
+                if (this.checked) {
+                    userMFAPreferences.mode = this.value;
+                    await saveMFAPreferences();
+                    console.log('Modo MFA cambiado a:', this.value);
+                }
+            });
+        });
+        
+        // ============================================
+        // FUNCIONES DE CAMBIO (REAUTENTICACIÓN)
+        // ============================================
+        
+        // Cambiar email
+        async function changeEmail(newEmail, password) {
+            const msgDiv = document.getElementById('emailMessage');
+            const saveBtn = document.getElementById('saveEmailBtn');
+            
+            const originalText = saveBtn.textContent;
+            saveBtn.disabled = true;
+            saveBtn.textContent = 'Verificando...';
+            msgDiv.innerHTML = '<div class="info">⏳ Verificando contraseña...</div>';
+            
+            try {
+                const { error: signInError } = await window.supabaseClient.auth.signInWithPassword({
+                    email: currentUser.email,
+                    password: password
+                });
+                if (signInError) throw new Error('Contraseña incorrecta');
+                
+                msgDiv.innerHTML = '<div class="info">⏳ Actualizando email...</div>';
+                
+                const { error } = await window.supabaseClient.auth.updateUser({ email: newEmail });
+                if (error) throw error;
+                
+                currentUser.email = newEmail;
+                localStorage.setItem('kairosUser', JSON.stringify(currentUser));
+                document.getElementById('profileEmail').textContent = newEmail;
+                
+                msgDiv.innerHTML = '<div class="success">✅ Email actualizado. Revisa tu nuevo email para confirmar.</div>';
+                setTimeout(() => { closeModals(); }, 2000);
+            } catch (error) {
+                msgDiv.innerHTML = `<div class="error">❌ ${error.message}</div>`;
+                saveBtn.disabled = false;
+                saveBtn.textContent = originalText;
+            }
+        }
+        
+        // Cambiar contraseña
+        async function changePassword(currentPassword, newPassword) {
+            const msgDiv = document.getElementById('passwordMessage');
+            const saveBtn = document.getElementById('savePasswordBtn');
+            
+            const originalText = saveBtn.textContent;
+            saveBtn.disabled = true;
+            saveBtn.textContent = 'Verificando...';
+            msgDiv.innerHTML = '<div class="info">⏳ Verificando contraseña actual...</div>';
+            
+            try {
+                const { error: signInError } = await window.supabaseClient.auth.signInWithPassword({
+                    email: currentUser.email,
+                    password: currentPassword
+                });
+                if (signInError) throw new Error('Contraseña actual incorrecta');
+                
+                msgDiv.innerHTML = '<div class="info">⏳ Cambiando contraseña...</div>';
+                
+                const { error } = await window.supabaseClient.auth.updateUser({ password: newPassword });
+                if (error) throw error;
+                
+                msgDiv.innerHTML = '<div class="success">✅ Contraseña actualizada correctamente</div>';
+                setTimeout(() => {
+                    closeModals();
+                    alert('✅ Contraseña cambiada correctamente. Serás redirigido para iniciar sesión con tu nueva contraseña.');
+                    window.location.href = 'login.html';
+                }, 1500);
+            } catch (error) {
+                msgDiv.innerHTML = `<div class="error">❌ ${error.message}</div>`;
+                saveBtn.disabled = false;
+                saveBtn.textContent = originalText;
+            }
+        }
+        
+        // ============================================
+        // VERIFICAR 2FA PARA ACCIONES SENSIBLES
+        // ============================================
+        async function checkMFAAndExecute(actionType, data, callback) {
+            try {
+                const { data: factors, error } = await window.supabaseClient.auth.mfa.listFactors();
+                if (error) throw error;
+                
+                const hasMFA = factors.totp && factors.totp.some(f => f.status === 'verified');
+                
+                if (!hasMFA) {
+                    // Sin 2FA, ejecutar directamente
+                    await callback(data);
+                    return;
+                }
+                
+                // Con 2FA, guardar callback y mostrar modal
+                pendingActionCallback = () => callback(data);
+                pendingActionData = data;
+                
+                const factorId = factors.totp.find(f => f.status === 'verified').id;
+                window.mfaFactorId = factorId;
+                
+                document.getElementById('sensitiveMfaCode').value = '';
+                document.getElementById('sensitiveMfaMessage').innerHTML = '';
+                modal2FASensitive.style.display = 'block';
+                
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al verificar 2FA: ' + error.message);
+            }
+        }
+        
+        async function verifyMFAAndExecute(code) {
+            if (!pendingActionCallback) {
+                document.getElementById('sensitiveMfaMessage').innerHTML = '<div class="error">❌ Error: No hay acción pendiente.</div>';
+                return false;
+            }
+            
+            try {
+                const { data: challenge, error: challengeError } = await window.supabaseClient.auth.mfa.challenge({
+                    factorId: window.mfaFactorId
+                });
+                if (challengeError) throw challengeError;
+                
+                const { data: verifyData, error: verifyError } = await window.supabaseClient.auth.mfa.verify({
+                    factorId: window.mfaFactorId,
+                    challengeId: challenge.id,
+                    code: code
+                });
+                if (verifyError) throw verifyError;
+                
+                // Actualizar sesión con token AAL2
+                if (verifyData && verifyData.access_token) {
+                    const currentSession = (await window.supabaseClient.auth.getSession()).data.session;
+                    await window.supabaseClient.auth.setSession({
+                        access_token: verifyData.access_token,
+                        refresh_token: verifyData.refresh_token || currentSession?.refresh_token
+                    });
+                } else {
+                    await window.supabaseClient.auth.refreshSession();
+                }
+                
+                await new Promise(resolve => setTimeout(resolve, 300));
+                
+                const callback = pendingActionCallback;
+                const data = pendingActionData;
+                
+                pendingActionCallback = null;
+                pendingActionData = null;
+                
+                await callback(data);
+                
+                modal2FASensitive.style.display = 'none';
+                return true;
+                
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('sensitiveMfaMessage').innerHTML = '<div class="error">❌ Código incorrecto. Inténtalo de nuevo.</div>';
+                return false;
+            }
+        }
+        
+        // ============================================
+        // EVENTOS DE BOTONES
+        // ============================================
+        
+        // Abrir modales
+        document.getElementById('editNameBtn').onclick = () => {
+            document.getElementById('newName').value = '';
+            document.getElementById('nameMessage').innerHTML = '';
+            modalName.style.display = 'block';
+        };
+        document.getElementById('editEmailBtn').onclick = () => {
+            document.getElementById('newEmail').value = '';
+            document.getElementById('emailPassword').value = '';
+            document.getElementById('emailMessage').innerHTML = '';
+            modalEmail.style.display = 'block';
+        };
+        document.getElementById('editPasswordBtn').onclick = () => {
+            document.getElementById('currentPassword').value = '';
+            document.getElementById('newPassword').value = '';
+            document.getElementById('confirmPassword').value = '';
+            document.getElementById('passwordMessage').innerHTML = '';
+            modalPassword.style.display = 'block';
+        };
+        
+        // Configurar 2FA (TOTP)
+        document.getElementById('totpSetupBtn').onclick = () => {
+            modalMFA.style.display = 'block';
+            startMFAEnrollment();
+        };
+        
+        // ============================================
+        // BIOMETRÍA
+        // ============================================
+        document.getElementById('biometricSetupBtn').onclick = async () => {
+            // Verificar compatibilidad
+            if (!window.isWebAuthnSupported || !isWebAuthnSupported()) {
+                alert('❌ Tu navegador no soporta autenticación biométrica. Usa Chrome, Edge o Safari.');
+                return;
+            }
+            
+            const available = await isBiometricAvailable();
+            if (!available) {
+                alert('❌ Tu dispositivo no tiene sensor biométrico (huella o Face ID) disponible.');
+                return;
+            }
+            
+            // Si ya está activado, preguntar si desactivar
+            if (userMFAPreferences.biometricEnabled) {
+                if (confirm('¿Desactivar la autenticación biométrica?')) {
+                    userMFAPreferences.biometricEnabled = false;
+                    localStorage.removeItem('biometric_credential');
+                    await saveMFAPreferences();
+                    updateUIForMFAPreferences();
+                    alert('✅ Autenticación biométrica desactivada.');
+                }
+                return;
+            }
+            
+            // Mostrar modal de configuración
+            document.getElementById('biometricStatusMsg').innerHTML = '';
+            document.getElementById('biometricMessage').innerHTML = '';
+            modalBiometric.style.display = 'block';
+        };
+        
+        // Registrar biometría
+        document.getElementById('registerBiometricBtn').onclick = async function() {
+            const btn = this;
+            const msgDiv = document.getElementById('biometricMessage');
+            
+            btn.disabled = true;
+            btn.textContent = '⏳ Registrando...';
+            msgDiv.innerHTML = '<div class="info">⏳ Preparando registro biométrico...</div>';
+            
+            try {
+                // Registrar credencial
+                const credential = await registerBiometricCredential(currentUser);
+                
+                // Guardar en localStorage
+                localStorage.setItem('biometric_credential', JSON.stringify({
+                    id: credential.id,
+                    rawId: credential.rawId
+                }));
+                
+                // Actualizar preferencias
+                userMFAPreferences.biometricEnabled = true;
+                await saveMFAPreferences();
+                updateUIForMFAPreferences();
+                
+                msgDiv.innerHTML = '<div class="success">✅ Biometría registrada correctamente.</div>';
+                document.getElementById('biometricStatusMsg').innerHTML = '<div class="success">✅ Dispositivo registrado con éxito.</div>';
+                
+                setTimeout(() => {
+                    closeModals();
+                }, 2000);
+                
+            } catch (error) {
+                console.error('Error:', error);
+                msgDiv.innerHTML = `<div class="error">❌ ${error.message}</div>`;
+                btn.disabled = false;
+                btn.textContent = '🔐 Registrar biometría';
+            }
+        };
+        
+        // ============================================
+        // CAMBIAR NOMBRE
+        // ============================================
+        document.getElementById('saveNameBtn').onclick = async () => {
+            const newName = document.getElementById('newName').value;
+            const msgDiv = document.getElementById('nameMessage');
+            if (!newName) {
+                msgDiv.innerHTML = '<div class="error">❌ Escribe un nombre</div>';
+                return;
+            }
+            try {
+                const { error } = await window.supabaseClient.auth.updateUser({ data: { name: newName } });
+                if (error) throw error;
+                currentUser.name = newName;
+                localStorage.setItem('kairosUser', JSON.stringify(currentUser));
+                document.getElementById('profileName').textContent = newName;
+                if (loginLink) loginLink.innerHTML = `👤 ${newName.toUpperCase()}`;
+                msgDiv.innerHTML = '<div class="success">✅ Nombre actualizado</div>';
+                setTimeout(() => { closeModals(); }, 1500);
+            } catch (error) {
+                msgDiv.innerHTML = `<div class="error">❌ ${error.message}</div>`;
+            }
+        };
+        
+        // ============================================
+        // CAMBIAR EMAIL (CON 2FA)
+        // ============================================
+        document.getElementById('saveEmailBtn').onclick = async () => {
+            const newEmail = document.getElementById('newEmail').value;
+            const password = document.getElementById('emailPassword').value;
+            const msgDiv = document.getElementById('emailMessage');
+            
+            if (!newEmail) {
+                msgDiv.innerHTML = '<div class="error">❌ Introduce el nuevo email</div>';
+                return;
+            }
+            if (!newEmail.includes('@')) {
+                msgDiv.innerHTML = '<div class="error">❌ Email inválido</div>';
+                return;
+            }
+            if (!password) {
+                msgDiv.innerHTML = '<div class="error">❌ Introduce tu contraseña actual</div>';
+                return;
+            }
+            
+            msgDiv.innerHTML = '<div class="info">⏳ Verificando...</div>';
+            await checkMFAAndExecute('email', { newEmail, password }, changeEmail);
+        };
+        
+        // ============================================
+        // CAMBIAR CONTRASEÑA (CON 2FA)
+        // ============================================
+        document.getElementById('savePasswordBtn').onclick = async () => {
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const msgDiv = document.getElementById('passwordMessage');
+            
+            if (!currentPassword || !newPassword || !confirmPassword) {
+                msgDiv.innerHTML = '<div class="error">❌ Completa todos los campos</div>';
+                return;
+            }
+            if (newPassword.length < 6) {
+                msgDiv.innerHTML = '<div class="error">❌ La nueva contraseña debe tener al menos 6 caracteres</div>';
+                return;
+            }
+            if (newPassword !== confirmPassword) {
+                msgDiv.innerHTML = '<div class="error">❌ Las contraseñas no coinciden</div>';
+                return;
+            }
+            
+            msgDiv.innerHTML = '<div class="info">⏳ Verificando...</div>';
+            await checkMFAAndExecute('password', { currentPassword, newPassword }, changePassword);
+        };
+        
+        // ============================================
+        // VERIFICAR 2FA MODAL
+        // ============================================
+        document.getElementById('verifySensitiveMfaBtn').onclick = async () => {
+            const code = document.getElementById('sensitiveMfaCode').value.trim();
+            if (!code || code.length !== 6) {
+                document.getElementById('sensitiveMfaMessage').innerHTML = '<div class="error">❌ Introduce un código de 6 dígitos</div>';
+                return;
+            }
+            
+            const verifyBtn = document.getElementById('verifySensitiveMfaBtn');
+            const originalText = verifyBtn.textContent;
+            verifyBtn.disabled = true;
+            verifyBtn.textContent = 'Verificando...';
+            
+            await verifyMFAAndExecute(code);
+            
+            verifyBtn.disabled = false;
+            verifyBtn.textContent = originalText;
+        };
+        
+        document.getElementById('sensitiveMfaCode').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                document.getElementById('verifySensitiveMfaBtn').click();
+            }
+        });
+        
+        // ============================================
+        // MOSTRAR/OCULTAR CONTRASEÑA
+        // ============================================
+        function setupPasswordToggle(toggleId, inputId) {
+            const toggle = document.getElementById(toggleId);
+            const input = document.getElementById(inputId);
+            if (toggle && input) {
+                toggle.onclick = () => {
+                    const type = input.type === 'password' ? 'text' : 'password';
+                    input.type = type;
+                    toggle.textContent = type === 'password' ? '👁️' : '🙈';
+                };
+            }
+        }
+        
+        setupPasswordToggle('toggleCurrentPwd', 'currentPassword');
+        setupPasswordToggle('toggleNewPwd', 'newPassword');
+        setupPasswordToggle('toggleConfirmPwd', 'confirmPassword');
+        setupPasswordToggle('toggleEmailPwd', 'emailPassword');
+        
+        // ============================================
+        // MFA / 2FA SETUP (TOTP)
+        // ============================================
+        let currentFactorId = null;
+
+        async function ensureValidSession() {
+            try {
+                const { data: { session }, error: sessionError } = await window.supabaseClient.auth.getSession();
+                if (sessionError || !session) {
+                    const { data: { session: refreshed }, error: refreshError } = 
+                        await window.supabaseClient.auth.refreshSession();
+                    if (refreshError || !refreshed) {
+                        alert('Tu sesión expiró. Por favor, inicia sesión nuevamente.');
+                        localStorage.removeItem('kairosUser');
+                        window.location.href = 'landing.html';
+                        return false;
+                    }
+                    return true;
+                }
+                return true;
+            } catch (error) {
+                console.error('Error:', error);
+                return false;
+            }
+        }
+
+        async function startMFAEnrollment() {
+            const sessionValid = await ensureValidSession();
+            if (!sessionValid) return;
+            
+            const modalTitle = document.getElementById('mfaModalTitle');
+            const step1Div = document.getElementById('mfaStep1');
+            const messageDiv = document.getElementById('mfaMessage');
+            const mfaCodeInput = document.getElementById('mfaCode');
+            const verifyBtn = document.getElementById('verifyMfaBtn');
+            const qrContainer = document.getElementById('qrCodeContainer');
+            
+            let isProcessing = false;
+            
+            try {
+                const { data, error } = await window.supabaseClient.auth.mfa.getAuthenticatorAssuranceLevel();
+                if (error) throw error;
+                
+                if (data && data.nextLevel === 'aal2') {
+                    if (confirm('¿Desactivar el código de 6 dígitos?')) {
+                        const { data: factors } = await window.supabaseClient.auth.mfa.listFactors();
+                        const totpFactors = factors.totp || [];
+                        for (const factor of totpFactors) {
+                            if (factor.status === 'verified') {
+                                const { error: unenrollError } = await window.supabaseClient.auth.mfa.unenroll({ 
+                                    factorId: factor.id 
+                                });
+                                if (unenrollError) throw unenrollError;
+                            }
+                        }
+                        userMFAPreferences.totpEnabled = false;
+                        await saveMFAPreferences();
+                        updateUIForMFAPreferences();
+                        closeModals();
+                        alert('✅ Código de 6 dígitos desactivado.');
+                    } else {
+                        closeModals();
+                    }
+                    return;
+                }
+                
+                modalTitle.textContent = 'Activar código de 6 dígitos';
+                messageDiv.innerHTML = '';
+                step1Div.style.display = 'block';
+                mfaCodeInput.value = '';
+                qrContainer.innerHTML = '<div>Cargando QR...</div>';
+                
+                const { data: enrollData, error: enrollError } = await window.supabaseClient.auth.mfa.enroll({ 
+                    factorType: 'totp' 
+                });
+                if (enrollError) throw enrollError;
+                
+                currentFactorId = enrollData.id;
+                
+                qrContainer.innerHTML = `
+                    <div style="background: white; padding: 1rem; border-radius: 8px; display: inline-block;">
+                        <img src="${enrollData.totp.qr_code}" alt="QR" style="width: 200px; height: 200px;">
+                    </div>
+                    <p style="font-size: 0.8rem; margin-top: 1rem;">
+                        📱 Código secreto: <strong style="background: #2a2a2a; padding: 2px 4px;">${enrollData.totp.secret}</strong>
+                    </p>
+                    <p style="font-size: 0.7rem; color: #888;">Escanea el QR con Google Authenticator</p>
+                `;
+                
+                verifyBtn.onclick = async () => {
+                    if (isProcessing) return;
+                    isProcessing = true;
+                    verifyBtn.disabled = true;
+                    verifyBtn.textContent = 'Verificando...';
+                    
+                    const code = mfaCodeInput.value.trim();
+                    if (!code || code.length !== 6) {
+                        messageDiv.innerHTML = '<div class="error">❌ Introduce un código de 6 dígitos</div>';
+                        isProcessing = false;
+                        verifyBtn.disabled = false;
+                        verifyBtn.textContent = 'Verificar y activar';
+                        return;
+                    }
+                    
+                    try {
+                        const { data: challengeData, error: challengeError } = await window.supabaseClient.auth.mfa.challenge({
+                            factorId: currentFactorId
+                        });
+                        if (challengeError) throw challengeError;
+                        
+                        const { error: verifyError } = await window.supabaseClient.auth.mfa.verify({
+                            factorId: currentFactorId,
+                            challengeId: challengeData.id,
+                            code: code
+                        });
+                        if (verifyError) throw verifyError;
+                        
+                        userMFAPreferences.totpEnabled = true;
+                        await saveMFAPreferences();
+                        updateUIForMFAPreferences();
+                        
+                        messageDiv.innerHTML = '<div class="success">✅ Código de 6 dígitos activado correctamente</div>';
+                        
+                        setTimeout(async () => {
+                            closeModals();
+                        }, 1500);
+                        
+                    } catch (error) {
+                        console.error('Error:', error);
+                        messageDiv.innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
+                        isProcessing = false;
+                        verifyBtn.disabled = false;
+                        verifyBtn.textContent = 'Verificar y activar';
+                    }
+                };
+                
+            } catch (error) {
+                console.error('Error:', error);
+                messageDiv.innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
+            }
+        }
+
+        // ============================================
+        // INICIALIZAR
+        // ============================================
+        loadMFAPreferences();
+        
+        // ============================================
+        // CERRAR SESIÓN
+        // ============================================
+        document.getElementById('logoutBtn').addEventListener('click', async () => {
+            if (window.supabaseClient) await window.supabaseClient.auth.signOut();
+            localStorage.removeItem('kairosUser');
+            window.location.href = 'landing.html';
+        });
+    </script>
+</body>
+</html>

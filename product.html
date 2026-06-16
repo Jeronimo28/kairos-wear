@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Producto · Kairos Wear</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <style>
+        .product-detail {
+            padding: 8rem 5% 5rem;
+            min-height: 100vh;
+        }
+        .product-detail-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            max-width: 1100px;
+            margin: 0 auto;
+            align-items: start;
+        }
+        .product-detail-image img {
+            width: 100%;
+            height: auto;
+            background: #1a1a1a;
+            border-radius: 4px;
+        }
+        .product-detail-info h1 {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.02em;
+        }
+        .product-detail-price {
+            font-size: 1.6rem;
+            color: #b87c4f;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+        }
+        .product-detail-description {
+            color: #b0b0b0;
+            margin-bottom: 2rem;
+            line-height: 1.7;
+            font-size: 0.95rem;
+        }
+
+        /* Tallas */
+        .size-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: #888;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+        .size-label span { color: #e5e5e5; margin-left: 0.4rem; }
+        .size-grid {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 1.5rem;
+        }
+        .size-btn-lg {
+            background: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            color: #e5e5e5;
+            padding: 10px 18px;
+            border-radius: 4px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+            position: relative;
+        }
+        .size-btn-lg:hover:not(:disabled) {
+            border-color: #b87c4f;
+            color: #b87c4f;
+        }
+        .size-btn-lg.selected {
+            background: #b87c4f;
+            border-color: #b87c4f;
+            color: #0a0a0a;
+        }
+        .size-btn-lg.out-of-stock {
+            opacity: 0.28;
+            cursor: not-allowed;
+            text-decoration: line-through;
+        }
+        .stock-indicator {
+            font-size: 0.75rem;
+            color: #666;
+            margin-bottom: 1.2rem;
+        }
+        .stock-indicator.low { color: #ff9800; }
+        .stock-indicator.ok  { color: #4caf50; }
+
+        /* Cantidad */
+        .qty-row {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+        .qty-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: #888;
+            font-weight: 600;
+            min-width: 70px;
+        }
+        .qty-ctrl {
+            display: flex;
+            align-items: center;
+            gap: 0;
+            border: 1px solid #2a2a2a;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .qty-btn {
+            background: #1a1a1a;
+            border: none;
+            color: #e5e5e5;
+            width: 36px;
+            height: 40px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: background 0.2s;
+            font-family: inherit;
+        }
+        .qty-btn:hover { background: #b87c4f; color: #0a0a0a; }
+        .qty-display {
+            width: 44px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.95rem;
+            background: #0f0f0f;
+            height: 40px;
+            line-height: 40px;
+            border-left: 1px solid #2a2a2a;
+            border-right: 1px solid #2a2a2a;
+        }
+
+        /* Botón añadir */
+        .btn-add-detail {
+            width: 100%;
+            padding: 1rem;
+            background: #b87c4f;
+            color: #0a0a0a;
+            border: none;
+            border-radius: 4px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            cursor: pointer;
+            letter-spacing: 1px;
+            transition: background 0.2s;
+            margin-bottom: 1rem;
+        }
+        .btn-add-detail:hover { background: #9a623d; }
+        .btn-add-detail.needs-size {
+            background: #2a2a2a;
+            color: #888;
+            cursor: default;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 0.5rem;
+            color: #666;
+            text-decoration: none;
+            font-size: 0.88rem;
+        }
+        .back-link:hover { color: #b87c4f; }
+
+        @media (max-width: 768px) {
+            .product-detail-container {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+            .product-detail { padding: 6rem 1rem 3rem; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">
+                <a href="index.html">
+                    <img src="imagenes/logo.png" alt="Kairos" class="logo-img">
+                </a>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html">INICIO</a></li>
+                <li><a href="index.html#coleccion">COLECCIÓN</a></li>
+                <li><a href="comunidad.html">COMUNIDAD</a></li>
+                <li><a href="#" id="loginLink">INICIAR SESIÓN</a></li>
+            </ul>
+            <div class="cart-icon" id="cartIcon">
+                <span class="cart-icon-symbol">🛒</span>
+                <span class="cart-count" id="cartCount">0</span>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="product-detail">
+            <div class="product-detail-container">
+                <div class="product-detail-image">
+                    <img id="productImage" src="" alt=""
+                        onerror="this.src='https://placehold.co/600x800/1a1a1a/666?text=Kairos'">
+                </div>
+                <div class="product-detail-info">
+                    <h1 id="productName"></h1>
+                    <p class="product-detail-price" id="productPrice"></p>
+                    <p class="product-detail-description" id="productDescription"></p>
+
+                    <!-- Selector de talla -->
+                    <div class="size-label">TALLA <span id="selectedSizeLabel">—</span></div>
+                    <div class="size-grid" id="sizeGrid"></div>
+                    <div class="stock-indicator" id="stockIndicator"></div>
+
+                    <!-- Cantidad -->
+                    <div class="qty-row">
+                        <span class="qty-label">CANTIDAD</span>
+                        <div class="qty-ctrl">
+                            <button class="qty-btn" id="qtyMinus">−</button>
+                            <span class="qty-display" id="qtyDisplay">1</span>
+                            <button class="qty-btn" id="qtyPlus">+</button>
+                        </div>
+                    </div>
+
+                    <button class="btn-add-detail needs-size" id="addToCartBtn">ELIGE UNA TALLA</button>
+                    <a href="index.html#coleccion" class="back-link">← Volver a la colección</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div id="cartModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3>🛒 Tu carrito</h3>
+            <div id="cartItems"></div>
+            <div class="cart-total">
+                <strong>Total: <span id="cartTotal">0</span>€</strong>
+            </div>
+            <button id="checkoutBtn" class="btn-checkout">FINALIZAR PEDIDO</button>
+            <p class="checkout-note">Envío gratis en pedidos +50€</p>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-logo">KAIROS WEAR</div>
+            <p class="footer-tagline">El momento oportuno</p>
+            <div class="social-links">
+                <a href="#">Instagram</a>
+                <a href="#">Twitter</a>
+                <a href="#">TikTok</a>
+            </div>
+            <p class="copyright">© 2026 Kairos Wear. Todos los momentos.</p>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script>
+        const SIZES = ['XS','S','M','L','XL','XXL'];
+        let selectedSize = null;
+        let qty = 1;
+
+        const user = JSON.parse(localStorage.getItem('kairosUser'));
+        const loginLink = document.getElementById('loginLink');
+        if (user && user.loggedIn) {
+            if (loginLink) { loginLink.innerHTML = `👤 ${user.name.toUpperCase()}`; loginLink.href = 'ajustes.html'; }
+        }
+
+        function loadProductDetail() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const productId = parseInt(urlParams.get('id'));
+            const product = products.find(p => p.id === productId);
+            if (!product) { window.location.href = 'index.html'; return; }
+
+            document.title = `${product.name} · Kairos Wear`;
+            document.getElementById('productName').textContent = product.name;
+            document.getElementById('productPrice').textContent = product.price + '€';
+            document.getElementById('productDescription').textContent = product.description;
+            document.getElementById('productImage').src = product.image;
+            document.getElementById('productImage').alt = product.name;
+
+            // Generar botones de talla
+            const sizeGrid = document.getElementById('sizeGrid');
+            SIZES.forEach(size => {
+                const stock = product.stock[size] || 0;
+                const btn = document.createElement('button');
+                btn.className = `size-btn-lg${stock === 0 ? ' out-of-stock' : ''}`;
+                btn.textContent = size;
+                btn.disabled = stock === 0;
+                btn.addEventListener('click', () => selectSize(size, stock, product));
+                sizeGrid.appendChild(btn);
+            });
+
+            // Controles de cantidad
+            document.getElementById('qtyMinus').addEventListener('click', () => {
+                if (qty > 1) { qty--; document.getElementById('qtyDisplay').textContent = qty; }
+            });
+            document.getElementById('qtyPlus').addEventListener('click', () => {
+                if (!selectedSize) return;
+                const maxStock = product.stock[selectedSize] || 0;
+                if (qty < maxStock) { qty++; document.getElementById('qtyDisplay').textContent = qty; }
+                else showNotification(`Solo hay ${maxStock} en talla ${selectedSize}`);
+            });
+
+            // Botón añadir
+            document.getElementById('addToCartBtn').addEventListener('click', () => {
+                if (!selectedSize) return;
+                addToCart(product.id, selectedSize, qty);
+                // Reset
+                qty = 1;
+                document.getElementById('qtyDisplay').textContent = 1;
+            });
+        }
+
+        function selectSize(size, stock, product) {
+            selectedSize = size;
+            qty = 1;
+            document.getElementById('qtyDisplay').textContent = 1;
+            document.getElementById('selectedSizeLabel').textContent = size;
+
+            // Resaltar botón seleccionado
+            document.querySelectorAll('.size-btn-lg').forEach(b => b.classList.remove('selected'));
+            document.querySelectorAll('.size-btn-lg').forEach(b => {
+                if (b.textContent === size) b.classList.add('selected');
+            });
+
+            // Indicador de stock
+            const indicator = document.getElementById('stockIndicator');
+            if (stock <= 3) {
+                indicator.textContent = `⚠️ Solo quedan ${stock} unidades`;
+                indicator.className = 'stock-indicator low';
+            } else {
+                indicator.textContent = `✓ En stock (${stock} disponibles)`;
+                indicator.className = 'stock-indicator ok';
+            }
+
+            // Activar botón
+            const addBtn = document.getElementById('addToCartBtn');
+            addBtn.classList.remove('needs-size');
+            addBtn.textContent = 'AÑADIR AL CARRITO';
+        }
+
+        document.addEventListener('DOMContentLoaded', loadProductDetail);
+    </script>
+</body>
+</html>

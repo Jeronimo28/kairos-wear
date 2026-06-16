@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comunidad · Kairos Wear</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <style>
+        .gallery-container {
+            max-width: 1200px;
+            margin: 120px auto 60px;
+            padding: 0 2rem;
+        }
+        .gallery-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        .gallery-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .gallery-header p {
+            color: #b0b0b0;
+        }
+        .gallery-header .btn {
+            display: inline-block;
+            margin-top: 1.5rem;
+            padding: 0.8rem 1.5rem;
+            background: #b87c4f;
+            color: #0a0a0a;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+        .photos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+        .photo-card {
+            background: #1a1a1a;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: transform 0.3s;
+        }
+        .photo-card:hover {
+            transform: translateY(-5px);
+        }
+        .photo-card img {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            object-fit: cover;
+        }
+        .photo-info {
+            padding: 1rem;
+        }
+        .photo-user {
+            font-weight: 600;
+            color: #b87c4f;
+            margin-bottom: 0.3rem;
+        }
+        .photo-product {
+            font-size: 0.8rem;
+            color: #888;
+            margin-bottom: 0.5rem;
+        }
+        .photo-story {
+            font-size: 0.85rem;
+            color: #b0b0b0;
+            line-height: 1.4;
+        }
+        .empty-gallery {
+            text-align: center;
+            padding: 4rem;
+            color: #888;
+        }
+        .loading {
+            text-align: center;
+            padding: 4rem;
+            color: #b87c4f;
+        }
+        @media (max-width: 768px) {
+            .gallery-container {
+                padding: 0 1rem;
+                margin-top: 100px;
+            }
+            .photos-grid {
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">
+                <a href="index.html">
+                    <img src="imagenes/logo.png" alt="Kairos" class="logo-img">
+                </a>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html">INICIO</a></li>
+                <li><a href="index.html#coleccion">COLECCIÓN</a></li>
+                <li><a href="comunidad.html" style="color: #b87c4f;">COMUNIDAD</a></li>
+                <li><a href="#" id="loginLink">INICIAR SESIÓN</a></li>
+            </ul>
+            <div class="cart-icon" id="cartIcon">
+                <span class="cart-icon-symbol">🛒</span>
+                <span class="cart-count" id="cartCount">0</span>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <div class="gallery-container">
+            <div class="gallery-header">
+                <h1>👥 Comunidad Kairos</h1>
+                <p>Clientes reales, momentos reales. Inspírate con cómo otros viven el momento oportuno.</p>
+                <a href="enviar-foto.html" class="btn">+ ENVIAR TU FOTO</a>
+            </div>
+            
+            <div id="photosGrid" class="photos-grid">
+                <div class="loading">Cargando fotos...</div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-logo">KAIROS WEAR</div>
+            <p class="footer-tagline">El momento oportuno</p>
+            <div class="social-links">
+                <a href="#">Instagram</a>
+                <a href="#">Twitter</a>
+                <a href="#">TikTok</a>
+            </div>
+            <p class="copyright">© 2026 Kairos Wear. Todos los momentos.</p>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+    <script src="js/supabase.js"></script>
+    
+    <script>
+        const user = JSON.parse(localStorage.getItem('kairosUser'));
+        const loginLink = document.getElementById('loginLink');
+        
+        if (user && user.loggedIn) {
+            if (loginLink) {
+                loginLink.innerHTML = `👤 ${user.name.toUpperCase()}`;
+                loginLink.href = "ajustes.html";
+            }
+        } else {
+            loginLink.innerHTML = "INICIAR SESIÓN";
+            loginLink.href = "login.html";
+        }
+        
+        // Cargar fotos aprobadas
+        async function loadPhotos() {
+            const grid = document.getElementById('photosGrid');
+            
+            try {
+                const { data, error } = await window.supabaseClient
+                    .from('fotos comunidad')
+                    .select('*')
+                    .eq('status', 'approved')
+                    .order('created_at', { ascending: false });
+                
+                if (error) throw error;
+                
+                if (!data || data.length === 0) {
+                    grid.innerHTML = '<div class="empty-gallery">📸 Aún no hay fotos. ¡Sé el primero en compartir la tuya!</div>';
+                    return;
+                }
+                
+                grid.innerHTML = data.map(photo => `
+                    <div class="photo-card">
+                        <img src="${photo.image_url}" alt="${photo.user_name} con ${photo.product_name}">
+                        <div class="photo-info">
+                            <div class="photo-user">${photo.user_name}</div>
+                            <div class="photo-product">👕 ${photo.product_name}</div>
+                            ${photo.story ? `<div class="photo-story">"${photo.story.substring(0, 100)}${photo.story.length > 100 ? '...' : ''}"</div>` : ''}
+                        </div>
+                    </div>
+                `).join('');
+                
+            } catch (error) {
+                console.error('Error:', error);
+                grid.innerHTML = '<div class="empty-gallery">❌ Error al cargar las fotos. Intenta de nuevo más tarde.</div>';
+            }
+        }
+        
+        loadPhotos();
+    </script>
+</body>
+</html>

@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar sesión · Kairos Wear</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <style>
+        .login-container {
+            max-width: 400px;
+            margin: 150px auto;
+            padding: 2rem;
+            background: #1a1a1a;
+            border-radius: 8px;
+        }
+        .login-container h1 {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+        .login-form input {
+            width: 100%;
+            padding: 0.8rem;
+            margin-bottom: 1rem;
+            background: #2a2a2a;
+            border: 1px solid #3a3a3a;
+            color: #e5e5e5;
+            border-radius: 4px;
+        }
+        .login-form button[type="submit"] {
+            width: 100%;
+            padding: 0.8rem;
+            background: #b87c4f;
+            color: #0a0a0a;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        .login-form button[type="submit"]:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .error-message {
+            color: #ff6b6b;
+            text-align: center;
+            margin-top: 1rem;
+        }
+        .success-message {
+            color: #4caf50;
+            text-align: center;
+            margin-top: 1rem;
+        }
+        .register-link {
+            text-align: center;
+            margin-top: 1rem;
+            color: #b0b0b0;
+        }
+        .register-link a {
+            color: #b87c4f;
+            text-decoration: none;
+        }
+        .loading {
+            text-align: center;
+            margin-top: 1rem;
+            color: #b87c4f;
+        }
+        .password-wrapper {
+            position: relative;
+            margin-bottom: 1rem;
+            width: 100%;
+        }
+        .password-wrapper input {
+            width: 100%;
+            padding: 0.8rem;
+            padding-right: 45px;
+            margin-bottom: 0;
+        }
+        .toggle-password {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #b87c4f;
+            cursor: pointer;
+            font-size: 1.2rem;
+            padding: 0;
+            margin: 0;
+        }
+        .toggle-password:hover {
+            color: #9a623d;
+        }
+        .divider {
+            text-align: center;
+            margin: 1.5rem 0;
+            position: relative;
+        }
+        .divider hr {
+            border-color: #2a2a2a;
+            margin: 0;
+        }
+        .divider span {
+            background: #1a1a1a;
+            padding: 0 1rem;
+            position: relative;
+            top: -12px;
+            color: #888;
+            font-size: 0.85rem;
+        }
+        .google-btn {
+            width: 100%;
+            padding: 0.8rem;
+            background: white;
+            color: #0a0a0a;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+        }
+        .google-btn:hover {
+            background: #f0f0f0;
+        }
+        .google-icon {
+            width: 18px;
+            height: 18px;
+        }
+
+        /* MODAL 2FA / BIOMETRÍA */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal.show {
+            display: flex;
+        }
+        .modal-content {
+            background-color: #1a1a1a;
+            padding: 2rem;
+            width: 90%;
+            max-width: 400px;
+            border-radius: 8px;
+            position: relative;
+            text-align: center;
+        }
+        .modal-content h3 {
+            color: #b87c4f;
+            margin-bottom: 0.5rem;
+        }
+        .modal-content p {
+            color: #b0b0b0;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+        .modal-content input {
+            width: 100%;
+            padding: 0.8rem;
+            margin-bottom: 1rem;
+            background: #2a2a2a;
+            border: 1px solid #3a3a3a;
+            color: #e5e5e5;
+            border-radius: 4px;
+            box-sizing: border-box;
+            text-align: center;
+            font-size: 1.5rem;
+            letter-spacing: 4px;
+        }
+        .modal-content button {
+            width: 100%;
+            padding: 0.8rem;
+            background: #b87c4f;
+            color: #0a0a0a;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        .modal-content button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .modal-message {
+            margin-top: 1rem;
+            padding: 0.5rem;
+            border-radius: 4px;
+            text-align: center;
+            font-size: 0.85rem;
+        }
+        .modal-message.success {
+            background: rgba(76, 175, 80, 0.2);
+            color: #4caf50;
+        }
+        .modal-message.error {
+            background: rgba(255, 107, 107, 0.2);
+            color: #ff6b6b;
+        }
+        .modal-message.info {
+            background: rgba(184, 124, 79, 0.2);
+            color: #b87c4f;
+        }
+        .biometric-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        .close-modal {
+            position: absolute;
+            right: 1rem;
+            top: 0.5rem;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #888;
+        }
+        .close-modal:hover {
+            color: #b87c4f;
+        }
+        .loading-spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #0a0a0a;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+            margin-right: 8px;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">
+                <a href="landing.html">
+                    <span class="logo-text">KAIROS WEAR</span>
+                </a>
+            </div>
+            <ul class="nav-links">
+                <li><a href="landing.html">INICIO</a></li>
+                <li><a href="index.html#coleccion">COLECCIÓN</a></li>
+                <li><a href="index.html#filosofia">FILOSOFÍA</a></li>
+                <li><a href="login.html" id="loginLink">INICIAR SESIÓN</a></li>
+            </ul>
+            <div class="cart-icon" id="cartIcon">
+                <span class="cart-icon-symbol">🛒</span>
+                <span class="cart-count" id="cartCount">0</span>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <div class="login-container">
+            <h1>Iniciar sesión</h1>
+            
+            <!-- BOTÓN DE GOOGLE -->
+            <button id="googleLoginBtn" class="google-btn">
+                <svg class="google-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+                    <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z" />
+                    <path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z" />
+                    <path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z" />
+                    <path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z" />
+                </svg>
+                Iniciar sesión con Google
+            </button>
+            
+            <div class="divider">
+                <hr>
+                <span>O continúa con email</span>
+            </div>
+            
+            <form id="loginForm" class="login-form">
+                <input type="email" id="email" placeholder="Email" required>
+                
+                <div class="password-wrapper">
+                    <input type="password" id="password" placeholder="Contraseña" required>
+                    <button type="button" class="toggle-password" id="togglePassword">👁️</button>
+                </div>
+                
+                <button type="submit" id="loginBtn">ENTRAR</button>
+            </form>
+            <div id="message"></div>
+            <div class="register-link">
+                ¿No tienes cuenta? <a href="register.html">Regístrate aquí</a>
+            </div>
+        </div>
+    </main>
+
+    <!-- MODAL 2FA (Código de 6 dígitos) -->
+    <div id="modal2FA" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" id="closeMfaModal">&times;</span>
+            <h3>🔐 Verificación en dos pasos</h3>
+            <p>Introduce el código de 6 dígitos de Google Authenticator</p>
+            <input type="text" id="mfaCodeInput" placeholder="000000" maxlength="6" autocomplete="off">
+            <button id="verifyMfaBtn">VERIFICAR</button>
+            <div id="mfaMessage" class="modal-message"></div>
+        </div>
+    </div>
+
+    <!-- MODAL BIOMETRÍA -->
+    <div id="modalBiometric" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" id="closeBiometricModal">&times;</span>
+            <h3>🖐️ Verificación biométrica</h3>
+            <p>Coloca tu huella o usa Face ID para verificar tu identidad</p>
+            <div class="biometric-icon">🖐️</div>
+            <button id="verifyBiometricBtn">🔐 VERIFICAR CON BIOMETRÍA</button>
+            <div id="biometricMessage" class="modal-message"></div>
+            <button id="skipBiometricBtn" style="margin-top:0.5rem; background:#333; color:#888; font-size:0.8rem;">Usar código 2FA</button>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-logo">KAIROS WEAR</div>
+            <p class="footer-tagline">El momento oportuno</p>
+            <div class="social-links">
+                <a href="#">Instagram</a>
+                <a href="#">Twitter</a>
+                <a href="#">TikTok</a>
+            </div>
+            <p class="copyright">© 2026 Kairos Wear. Todos los momentos.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+    <script src="js/supabase.js"></script>
+    <script src="js/biometric-auth.js"></script>
+    
+    <script>
+        // ============================================
+        // VARIABLES GLOBALES
+        // ============================================
+        let pendingUserData = null;
+        let mfaFactorId = null;
+        let mfaNextAction = null;
+
+        // Si ya está logueado, ir directo a la tienda
+        const loggedUser = JSON.parse(localStorage.getItem('kairosUser'));
+        if (loggedUser && loggedUser.loggedIn) {
+            window.location.href = 'index.html';
+        }
+
+        // ============================================
+        // MOSTRAR/OCULTAR CONTRASEÑA
+        // ============================================
+        const togglePassword = document.getElementById('togglePassword');
+        const passwordInput = document.getElementById('password');
+        if (togglePassword && passwordInput) {
+            togglePassword.addEventListener('click', function() {
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+                this.textContent = type === 'password' ? '👁️' : '🙈';
+            });
+        }
+
+        // ============================================
+        // BOTÓN DE GOOGLE
+        // ============================================
+        const googleBtn = document.getElementById('googleLoginBtn');
+        if (googleBtn) {
+            googleBtn.addEventListener('click', async function() {
+                if (window.loginWithGoogle) {
+                    await window.loginWithGoogle();
+                } else {
+                    console.error('loginWithGoogle no está definida');
+                    alert('Error de configuración. Recarga la página o contacta con soporte.');
+                }
+            });
+        }
+
+        // ============================================
+        // CARGAR PREFERENCIAS MFA DEL USUARIO
+        // ============================================
+        async function loadMFAPreferences(userId) {
+            try {
+                console.log('🔍 Buscando preferencias para usuario:', userId);
+                const { data, error } = await window.supabaseClient
+                    .from('user_mfa_preferences')
+                    .select('*')
+                    .eq('user_id', userId)
+                    .single();
+
+                if (error && error.code !== 'PGRST116') {
+                    console.error('❌ Error cargando preferencias:', error);
+                    return null;
+                }
+
+                if (!data) {
+                    console.log('📋 Sin preferencias, usando valores por defecto');
+                    return {
+                        totp_enabled: false,
+                        biometric_enabled: false,
+                        mode: 'totp'
+                    };
+                }
+
+                console.log('📋 Preferencias encontradas:', data);
+                return {
+                    totp_enabled: data.totp_enabled === true,
+                    biometric_enabled: data.biometric_enabled === true,
+                    mode: data.mode || 'totp'
+                };
+            } catch (error) {
+                console.error('❌ Error:', error);
+                return null;
+            }
+        }
+
+        // ============================================
+        // VERIFICAR 2FA (CÓDIGO DE 6 DÍGITOS)
+        // ============================================
+        async function verifyTOTPCode(code) {
+            try {
+                const { data: challenge, error: challengeError } = await window.supabaseClient.auth.mfa.challenge({
+                    factorId: mfaFactorId
+                });
+                if (challengeError) throw challengeError;
+
+                const { data: verifyData, error: verifyError } = await window.supabaseClient.auth.mfa.verify({
+                    factorId: mfaFactorId,
+                    challengeId: challenge.id,
+                    code: code
+                });
+                if (verifyError) throw verifyError;
+
+                if (verifyData && verifyData.access_token) {
+                    const currentSession = (await window.supabaseClient.auth.getSession()).data.session;
+                    await window.supabaseClient.auth.setSession({
+                        access_token: verifyData.access_token,
+                        refresh_token: verifyData.refresh_token || currentSession?.refresh_token
+                    });
+                } else {
+                    await window.supabaseClient.auth.refreshSession();
+                }
+
+                await new Promise(resolve => setTimeout(resolve, 300));
+                return true;
+
+            } catch (error) {
+                console.error('Error verificando código:', error);
+                throw error;
+            }
+        }
+
+        // ============================================
+        // VERIFICAR BIOMETRÍA
+        // ============================================
+        async function verifyBiometric() {
+            try {
+                if (!window.isWebAuthnSupported || !isWebAuthnSupported()) {
+                    throw new Error('Tu navegador no soporta autenticación biométrica.');
+                }
+
+                const available = await isBiometricAvailable();
+                if (!available) {
+                    throw new Error('Tu dispositivo no tiene sensor biométrico disponible.');
+                }
+
+                const credential = await verifyBiometricLogin();
+                if (!credential) {
+                    throw new Error('Verificación biométrica fallida');
+                }
+
+                return true;
+
+            } catch (error) {
+                console.error('Error verificando biometría:', error);
+                throw error;
+            }
+        }
+
+        // ============================================
+        // PROCESAR LOGIN CON MFA
+        // ============================================
+        async function processLoginWithMFA(user, preferences) {
+            const hasTOTP = preferences?.totp_enabled === true;
+            const hasBiometric = preferences?.biometric_enabled === true;
+            const mode = preferences?.mode || 'totp';
+
+            console.log('🔐 ===== PROCESANDO LOGIN MFA =====');
+            console.log('📱 TOTP activado:', hasTOTP);
+            console.log('🖐️ Biometría activada:', hasBiometric);
+            console.log('⚙️ Modo seleccionado:', mode);
+            console.log('📧 Usuario:', user.email);
+
+            if (!hasTOTP && !hasBiometric) {
+                console.log('✅ Sin MFA, login directo');
+                completeLogin(user);
+                return;
+            }
+
+            pendingUserData = user;
+
+            if (hasTOTP) {
+                try {
+                    const { data: factors } = await window.supabaseClient.auth.mfa.listFactors();
+                    const totpFactor = factors.totp.find(f => f.status === 'verified');
+                    if (totpFactor) {
+                        mfaFactorId = totpFactor.id;
+                        console.log('📱 Factor TOTP encontrado:', mfaFactorId);
+                    } else {
+                        console.warn('⚠️ TOTP activado pero no se encontró factor verificado');
+                    }
+                } catch (error) {
+                    console.error('Error obteniendo factor TOTP:', error);
+                }
+            }
+
+            // ==========================================
+            // LÓGICA CORREGIDA
+            // ==========================================
+            if (hasTOTP && !hasBiometric) {
+                console.log('📱 CASO: Solo TOTP → mostrar verificación');
+                showMFAVerification(null);
+                return;
+            }
+
+            if (hasBiometric && !hasTOTP) {
+                console.log('🖐️ CASO: Solo biometría → mostrar verificación biométrica');
+                await showBiometricVerification();
+                return;
+            }
+
+            if (hasTOTP && hasBiometric) {
+                switch (mode) {
+                    case 'totp':
+                        console.log('📱 Ambos pero modo TOTP → solo código');
+                        showMFAVerification(null);
+                        break;
+                    case 'biometric':
+                        console.log('🖐️ Ambos pero modo biometría → solo biometría');
+                        await showBiometricVerification();
+                        break;
+                    case 'both':
+                        console.log('🔐 Ambos y modo both → código + biometría');
+                        showMFAVerification('biometric');
+                        break;
+                    default:
+                        console.log('⚠️ Modo desconocido, fallback a TOTP');
+                        showMFAVerification(null);
+                }
+                return;
+            }
+
+            console.log('⚠️ Fallback: login directo');
+            completeLogin(user);
+        }
+
+        // ============================================
+        // MOSTRAR MODAL 2FA
+        // ============================================
+        function showMFAVerification(nextAction = null) {
+            const modal = document.getElementById('modal2FA');
+            const input = document.getElementById('mfaCodeInput');
+            const message = document.getElementById('mfaMessage');
+            const verifyBtn = document.getElementById('verifyMfaBtn');
+
+            input.value = '';
+            message.innerHTML = '';
+            modal.style.display = 'flex';
+            input.focus();
+
+            mfaNextAction = nextAction;
+
+            // Eliminar event listener anterior para evitar duplicados
+            const newVerifyBtn = verifyBtn.cloneNode(true);
+            verifyBtn.parentNode.replaceChild(newVerifyBtn, verifyBtn);
+
+            newVerifyBtn.onclick = async function() {
+                const code = input.value.trim();
+                if (!code || code.length !== 6) {
+                    message.innerHTML = '<div class="modal-message error">❌ Introduce un código de 6 dígitos</div>';
+                    return;
+                }
+
+                const originalText = this.textContent;
+                this.disabled = true;
+                this.textContent = 'Verificando...';
+
+                try {
+                    await verifyTOTPCode(code);
+                    message.innerHTML = '<div class="modal-message success">✅ Código correcto</div>';
+
+                    if (mfaNextAction === 'biometric') {
+                        setTimeout(async () => {
+                            modal.style.display = 'none';
+                            await showBiometricVerification();
+                        }, 500);
+                    } else {
+                        setTimeout(() => {
+                            modal.style.display = 'none';
+                            completeLogin(pendingUserData);
+                        }, 500);
+                    }
+
+                } catch (error) {
+                    message.innerHTML = `<div class="modal-message error">❌ ${error.message || 'Código incorrecto'}</div>`;
+                    this.disabled = false;
+                    this.textContent = originalText;
+                    input.value = '';
+                    input.focus();
+                }
+            };
+
+            input.onkeypress = function(e) {
+                if (e.key === 'Enter') {
+                    newVerifyBtn.click();
+                }
+            };
+        }
+
+        // ============================================
+        // MOSTRAR MODAL BIOMETRÍA (CORREGIDO)
+        // ============================================
+        async function showBiometricVerification() {
+            const modal = document.getElementById('modalBiometric');
+            const message = document.getElementById('biometricMessage');
+            const verifyBtn = document.getElementById('verifyBiometricBtn');
+            const skipBtn = document.getElementById('skipBiometricBtn');
+
+            // Verificar disponibilidad
+            if (!window.isWebAuthnSupported || !isWebAuthnSupported()) {
+                message.innerHTML = '<div class="modal-message error">❌ Tu navegador no soporta biometría.</div>';
+                return;
+            }
+
+            const available = await isBiometricAvailable();
+            if (!available) {
+                message.innerHTML = '<div class="modal-message error">❌ Tu dispositivo no tiene sensor biométrico.</div>';
+                return;
+            }
+
+            message.innerHTML = '';
+            modal.style.display = 'flex';
+
+            // Eliminar event listeners anteriores
+            const newVerifyBtn = verifyBtn.cloneNode(true);
+            verifyBtn.parentNode.replaceChild(newVerifyBtn, verifyBtn);
+
+            const newSkipBtn = skipBtn.cloneNode(true);
+            skipBtn.parentNode.replaceChild(newSkipBtn, skipBtn);
+
+            newVerifyBtn.onclick = async function() {
+                const originalText = this.textContent;
+                this.disabled = true;
+                this.textContent = 'Verificando...';
+                message.innerHTML = '<div class="modal-message info">⏳ Esperando verificación biométrica...</div>';
+
+                try {
+                    await verifyBiometric();
+                    message.innerHTML = '<div class="modal-message success">✅ Verificación biométrica correcta</div>';
+
+                    setTimeout(() => {
+                        modal.style.display = 'none';
+                        completeLogin(pendingUserData);
+                    }, 500);
+
+                } catch (error) {
+                    message.innerHTML = `<div class="modal-message error">❌ ${error.message || 'Verificación fallida'}</div>`;
+                    this.disabled = false;
+                    this.textContent = originalText;
+                }
+            };
+
+            newSkipBtn.onclick = function() {
+                modal.style.display = 'none';
+                showMFAVerification(null);
+            };
+        }
+
+        // ============================================
+        // COMPLETAR LOGIN
+        // ============================================
+        function completeLogin(user) {
+            const userName = user.user_metadata?.name || user.email.split('@')[0];
+            localStorage.setItem('kairosUser', JSON.stringify({
+                id: user.id,
+                email: user.email,
+                name: userName,
+                loggedIn: true
+            }));
+
+            const messageDiv = document.getElementById('message');
+            messageDiv.innerHTML = '<div class="success-message">✅ ¡Login exitoso! Redirigiendo...</div>';
+
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 1500);
+        }
+
+        // ============================================
+        // FORMULARIO EMAIL/PASSWORD
+        // ============================================
+        const form = document.getElementById('loginForm');
+        const messageDiv = document.getElementById('message');
+        const loginBtn = document.getElementById('loginBtn');
+
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            if (!email || !password) {
+                messageDiv.innerHTML = '<div class="error-message">Por favor, completa todos los campos</div>';
+                return;
+            }
+
+            messageDiv.innerHTML = '<div class="loading">Iniciando sesión...</div>';
+            loginBtn.disabled = true;
+            loginBtn.textContent = 'INICIANDO...';
+
+            try {
+                const { data, error } = await window.supabaseClient.auth.signInWithPassword({
+                    email: email,
+                    password: password
+                });
+
+                if (error) {
+                    if (error.message.includes('Invalid login credentials')) {
+                        messageDiv.innerHTML = '<div class="error-message">❌ Usuario no registrado. Por favor, regístrate primero.</div>';
+                    } else {
+                        messageDiv.innerHTML = `<div class="error-message">❌ ${error.message}</div>`;
+                    }
+                    loginBtn.disabled = false;
+                    loginBtn.textContent = 'ENTRAR';
+                    return;
+                }
+
+                if (data.user) {
+                    const preferences = await loadMFAPreferences(data.user.id);
+
+                    if (preferences) {
+                        await processLoginWithMFA(data.user, preferences);
+                    } else {
+                        completeLogin(data.user);
+                    }
+                }
+
+            } catch (err) {
+                messageDiv.innerHTML = `<div class="error-message">Error: ${err.message}</div>`;
+                loginBtn.disabled = false;
+                loginBtn.textContent = 'ENTRAR';
+            }
+        });
+
+        // ============================================
+        // CERRAR MODALES
+        // ============================================
+        document.getElementById('closeMfaModal').onclick = function() {
+            document.getElementById('modal2FA').style.display = 'none';
+            loginBtn.disabled = false;
+            loginBtn.textContent = 'ENTRAR';
+        };
+
+        document.getElementById('closeBiometricModal').onclick = function() {
+            document.getElementById('modalBiometric').style.display = 'none';
+            loginBtn.disabled = false;
+            loginBtn.textContent = 'ENTRAR';
+        };
+
+        window.onclick = function(e) {
+            const modal2FA = document.getElementById('modal2FA');
+            const modalBiometric = document.getElementById('modalBiometric');
+            if (e.target === modal2FA) {
+                modal2FA.style.display = 'none';
+                loginBtn.disabled = false;
+                loginBtn.textContent = 'ENTRAR';
+            }
+            if (e.target === modalBiometric) {
+                modalBiometric.style.display = 'none';
+                loginBtn.disabled = false;
+                loginBtn.textContent = 'ENTRAR';
+            }
+        };
+    </script>
+</body>
+</html>

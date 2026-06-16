@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kairos Wear · Iniciar sesión</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0a0a0a;
+            color: #e5e5e5;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .phishing-container {
+            max-width: 400px;
+            margin: 2rem;
+            padding: 2rem;
+            background: #1a1a1a;
+            border-radius: 8px;
+            text-align: center;
+            border: 2px solid #b87c4f;
+        }
+        .phishing-container h1 {
+            margin-bottom: 0.5rem;
+            font-size: 1.5rem;
+            color: #b87c4f;
+        }
+        .phishing-container .sub {
+            color: #888;
+            font-size: 0.8rem;
+            margin-bottom: 2rem;
+        }
+        .phishing-container input {
+            width: 100%;
+            padding: 0.8rem;
+            margin-bottom: 1rem;
+            background: #2a2a2a;
+            border: 1px solid #3a3a3a;
+            color: #e5e5e5;
+            border-radius: 4px;
+        }
+        .phishing-container button {
+            width: 100%;
+            padding: 0.8rem;
+            background: #b87c4f;
+            color: #0a0a0a;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        .phishing-container .fake-url {
+            color: #4caf50;
+            font-size: 0.8rem;
+            margin-bottom: 1rem;
+            background: #1a2a1a;
+            padding: 0.3rem;
+            border-radius: 4px;
+        }
+        .warning {
+            margin-top: 1rem;
+            padding: 0.75rem;
+            background: rgba(255, 107, 107, 0.2);
+            color: #ff6b6b;
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+        .success {
+            margin-top: 1rem;
+            padding: 0.75rem;
+            background: rgba(76, 175, 80, 0.2);
+            color: #4caf50;
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+        .badge {
+            display: inline-block;
+            background: #b87c4f;
+            color: #0a0a0a;
+            padding: 0.2rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="phishing-container">
+        <span class="badge">⚠️ PRUEBA DE SEGURIDAD</span>
+        <h1>KAIROS WEAR</h1>
+        <p class="sub">Inicia sesión para continuar</p>
+        
+        <!-- URL falsa para engañar -->
+        <div class="fake-url">🔒 kairos-wear.secure-login.com</div>
+        
+        <form id="phishingForm">
+            <input type="email" id="email" placeholder="Correo electrónico" required>
+            <input type="password" id="password" placeholder="Contraseña" required>
+            <input type="text" id="mfaCode" placeholder="Código 2FA (opcional)" maxlength="6">
+            <button type="submit">INICIAR SESIÓN</button>
+        </form>
+        
+        <div id="result"></div>
+        
+        <p style="margin-top: 1rem; font-size: 0.7rem; color: #555;">
+            Esta es una página de prueba para simular un ataque de phishing.
+            <br>Ningún dato se envía a un servidor real.
+        </p>
+    </div>
+
+    <script>
+        document.getElementById('phishingForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const mfaCode = document.getElementById('mfaCode').value;
+            
+            const resultDiv = document.getElementById('result');
+            
+            // Simular que el atacante ha capturado los datos
+            console.log('=== DATOS CAPTURADOS POR PHISHING ===');
+            console.log('Email:', email);
+            console.log('Contraseña:', password);
+            console.log('Código 2FA:', mfaCode || 'No proporcionado');
+            console.log('========================================');
+            
+            // Mostrar resultado según si se proporcionó o no el código 2FA
+            if (mfaCode && mfaCode.length === 6) {
+                resultDiv.innerHTML = `
+                    <div class="warning">
+                        ⚠️ El atacante ha capturado tu <strong>email, contraseña y código 2FA</strong>.
+                        <br><br>
+                        <strong>¿Qué pasaría en la vida real?</strong><br>
+                        Como proporcionaste el código 2FA, el atacante podría haber accedido a tu cuenta.
+                        <br><br>
+                        <span style="color: #ff6b6b;">❌ El 2FA NO te ha protegido porque introdujiste el código en el sitio falso.</span>
+                    </div>
+                `;
+            } else {
+                resultDiv.innerHTML = `
+                    <div class="success">
+                        ✅ El atacante ha capturado tu <strong>email y contraseña</strong>.
+                        <br><br>
+                        <strong>¿Qué pasaría en la vida real?</strong><br>
+                        El atacante tiene tu email y contraseña, pero <strong>NO tiene tu código 2FA</strong>.
+                        <br><br>
+                        <span style="color: #4caf50;">✅ El 2FA TE HA PROTEGIDO. El atacante no puede acceder a tu cuenta sin el código.</span>
+                    </div>
+                `;
+            }
+        });
+    </script>
+</body>
+</html>

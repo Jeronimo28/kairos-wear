@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kairos Wear · Ropa para el momento oportuno</title>
+    <meta name="description" content="Kairos Wear. Ropa masculina para salir. Diseño atemporal, calidad y el instante perfecto.">
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">
+                <a href="index.html">
+                    <img src="imagenes/logo.png" alt="Kairos" class="logo-img">
+                </a>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html">INICIO</a></li>
+                <li><a href="#coleccion">COLECCIÓN</a></li>
+                <li><a href="#filosofia">FILOSOFÍA</a></li>
+                <li><a href="comunidad.html">COMUNIDAD</a></li>
+                <li><a href="#" id="loginLink">INICIAR SESIÓN</a></li>
+            </ul>
+            <div class="cart-icon" id="cartIcon">
+                <span class="cart-icon-symbol">🛒</span>
+                <span class="cart-count" id="cartCount">0</span>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="hero-content">
+                <h1>El momento oportuno.</h1>
+                <p class="subtitle">Siempre es el momento oportuno. Empieza por cómo te vistes.</p>
+                <a href="#coleccion" class="btn btn-primary">Ver colección</a>
+            </div>
+        </section>
+
+        <section id="coleccion" class="collection">
+            <div class="container">
+                <h2>Colección Actual</h2>
+                <p class="section-subtitle">Prendas pensadas para el momento oportuno</p>
+                <div class="products-grid" id="productsGrid"></div>
+            </div>
+        </section>
+
+        <section id="filosofia" class="philosophy">
+            <div class="container">
+                <h2>Kairos</h2>
+                <p class="greek">καιρός</p>
+                <p class="definition">El momento cualitativo, la oportunidad, el instante decisivo.</p>
+                <p>Kairos Wear nace para ese momento. Para cuando eliges salir, para cuando quieres que se note que sabes elegir. Cada prenda está pensada para encajar en el momento perfecto.</p>
+            </div>
+        </section>
+
+        <section class="newsletter">
+            <div class="container">
+                <h3>Primeros en saber</h3>
+                <p>Sé el primero en conocer nuevas colecciones y ediciones limitadas.</p>
+                <form id="newsletterForm">
+                    <input type="email" placeholder="tu@email.com" required>
+                    <button type="submit">APUNTARME</button>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-logo">KAIROS WEAR</div>
+            <p class="footer-tagline">El momento oportuno</p>
+            <div class="social-links">
+                <a href="#">Instagram</a>
+                <a href="#">Twitter</a>
+                <a href="#">TikTok</a>
+            </div>
+            <p class="copyright">© 2026 Kairos Wear. Todos los momentos.</p>
+        </div>
+    </footer>
+
+    <div id="cartModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3>🛒 Tu carrito</h3>
+            <div id="cartItems"></div>
+            <div class="cart-total">
+                <strong>Total: <span id="cartTotal">0</span>€</strong>
+            </div>
+            <button id="checkoutBtn" class="btn-checkout">FINALIZAR PEDIDO</button>
+            <p class="checkout-note">Envío gratis en pedidos +50€</p>
+        </div>
+    </div>
+
+    <script src="js/main.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+    <script src="js/supabase.js"></script>
+
+    <script>
+        // ============================================
+        // VERIFICAR SESIÓN REAL (NO localStorage)
+        // ============================================
+        async function verificarSesionYRedirigir() {
+            if (!window.supabaseClient) {
+                setTimeout(verificarSesionYRedirigir, 200);
+                return;
+            }
+
+            try {
+                const { data: { session }, error } = await window.supabaseClient.auth.getSession();
+
+                if (error) {
+                    console.error('Error obteniendo sesión:', error);
+                    if (!window.location.pathname.includes('landing.html')) {
+                        window.location.href = 'landing.html';
+                    }
+                    return;
+                }
+
+                if (session && session.user) {
+                    const user = session.user;
+                    const userName = user.user_metadata?.name || user.email.split('@')[0];
+                    
+                    localStorage.setItem('kairosUser', JSON.stringify({
+                        id: user.id,
+                        email: user.email,
+                        name: userName,
+                        loggedIn: true
+                    }));
+
+                    actualizarUIUsuario(userName);
+                    await verificarMFA(user);
+                    
+                } else {
+                    localStorage.removeItem('kairosUser');
+                    const path = window.location.pathname;
+                    if (!path.includes('landing.html') && !path.includes('login.html') && !path.includes('register.html')) {
+                        window.location.href = 'landing.html';
+                    }
+                }
+            } catch (error) {
+                console.error('Error verificando sesión:', error);
+                if (!window.location.pathname.includes('landing.html')) {
+                    window.location.href = 'landing.html';
+                }
+            }
+        }
+
+        // ============================================
+        // ACTUALIZAR UI
+        // ============================================
+        function actualizarUIUsuario(userName) {
+            const loginLink = document.getElementById('loginLink');
+            if (loginLink) {
+                loginLink.innerHTML = `👤 ${userName.toUpperCase()}`;
+                loginLink.href = "#";
+                loginLink.style.cursor = "pointer";
+                
+                const newLoginLink = loginLink.cloneNode(true);
+                loginLink.parentNode.replaceChild(newLoginLink, loginLink);
+                
+                newLoginLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    window.location.href = 'ajustes.html';
+                });
+                newLoginLink.title = "Ver mis ajustes";
+            }
+        }
+
+        // ============================================
+        // VERIFICAR 2FA (MFA) - CORREGIDO
+        // ============================================
+        async function verificarMFA(user) {
+            try {
+                // 1. Obtener preferencias del usuario
+                const { data: prefs, error: prefsError } = await window.supabaseClient
+                    .from('user_mfa_preferences')
+                    .select('*')
+                    .eq('user_id', user.id)
+                    .single();
+
+                // 2. Si no tiene preferencias o no tiene MFA activado, no hacer nada
+                if (prefsError || !prefs) {
+                    console.log('📋 Sin preferencias MFA, continuar');
+                    return;
+                }
+
+                const hasTOTP = prefs.totp_enabled === true;
+                const hasBiometric = prefs.biometric_enabled === true;
+                const mode = prefs.mode || 'totp';
+
+                console.log('🔐 Verificando MFA para usuario:', user.email);
+                console.log('📱 TOTP activado:', hasTOTP);
+                console.log('🖐️ Biometría activada:', hasBiometric);
+                console.log('⚙️ Modo:', mode);
+
+                // 3. Si no tiene ningún método MFA activado, no hacer nada
+                if (!hasTOTP && !hasBiometric) {
+                    console.log('✅ Sin MFA activado, continuar');
+                    return;
+                }
+
+                // 4. Verificar nivel actual de autenticación
+                const { data: aalData } = await window.supabaseClient.auth.mfa.getAuthenticatorAssuranceLevel();
+                
+                // 5. Si ya es AAL2, no hacer nada
+                if (aalData.currentLevel === 'aal2') {
+                    console.log('✅ Ya es AAL2, continuar');
+                    return;
+                }
+
+                // 6. Determinar qué método mostrar según preferencias
+                let metodo = 'totp';
+                
+                if (hasTOTP && !hasBiometric) {
+                    metodo = 'totp';
+                } else if (hasBiometric && !hasTOTP) {
+                    metodo = 'biometric';
+                } else if (hasTOTP && hasBiometric) {
+                    metodo = mode; // 'totp', 'biometric' o 'both'
+                }
+
+                console.log('🔐 Redirigiendo a mfa-verify.html con método:', metodo);
+
+                // 7. Guardar el método en localStorage
+                localStorage.setItem('mfaMethod', metodo);
+                localStorage.setItem('mfaRedirectAfter', '/index.html');
+
+                // 8. Redirigir a la página de verificación
+                if (!window.location.pathname.includes('mfa-verify.html')) {
+                    window.location.href = 'mfa-verify.html';
+                }
+
+            } catch (error) {
+                console.error('Error verificando MFA:', error);
+            }
+        }
+
+        // ============================================
+        // ESCUCHAR CAMBIOS DE AUTENTICACIÓN
+        // ============================================
+        if (window.supabaseClient) {
+            window.supabaseClient.auth.onAuthStateChange((event, session) => {
+                if (event === 'SIGNED_IN' && session) {
+                    const user = session.user;
+                    const userName = user.user_metadata?.name || user.email.split('@')[0];
+                    localStorage.setItem('kairosUser', JSON.stringify({
+                        id: user.id,
+                        email: user.email,
+                        name: userName,
+                        loggedIn: true
+                    }));
+                    actualizarUIUsuario(userName);
+                    
+                    if (!window.location.pathname.includes('mfa-verify.html')) {
+                        window.location.reload();
+                    }
+                }
+                if (event === 'SIGNED_OUT') {
+                    localStorage.removeItem('kairosUser');
+                    if (!window.location.pathname.includes('landing.html')) {
+                        window.location.href = 'landing.html';
+                    }
+                }
+            });
+        }
+
+        // ============================================
+        // INICIAR
+        // ============================================
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', verificarSesionYRedirigir);
+        } else {
+            verificarSesionYRedirigir();
+        }
+    </script>
+</body>
+</html>
