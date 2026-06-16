@@ -322,7 +322,7 @@
             <div class="biometric-icon">🖐️</div>
             <button id="verifyBiometricBtn">🔐 VERIFICAR CON BIOMETRÍA</button>
             <div id="biometricMessage" class="modal-message"></div>
-            <button id="skipBiometricBtn" style="margin-top:0.5rem; background:#333; color:#888; font-size:0.8rem;">Usar código 2FA</button>
+            <button id="skipBiometricBtn" style="margin-top:0.5rem; background:#333; color:#888; font-size:0.8rem;">📱 Usar código 2FA</button>
         </div>
     </div>
 
@@ -638,12 +638,21 @@
             // Verificar disponibilidad
             if (!window.isWebAuthnSupported || !isWebAuthnSupported()) {
                 message.innerHTML = '<div class="modal-message error">❌ Tu navegador no soporta biometría.</div>';
+                // Mostrar botón para usar TOTP
+                if (skipBtn) {
+                    skipBtn.style.display = 'block';
+                    skipBtn.textContent = '📱 Usar código 2FA';
+                }
                 return;
             }
 
             const available = await isBiometricAvailable();
             if (!available) {
                 message.innerHTML = '<div class="modal-message error">❌ Tu dispositivo no tiene sensor biométrico.</div>';
+                if (skipBtn) {
+                    skipBtn.style.display = 'block';
+                    skipBtn.textContent = '📱 Usar código 2FA';
+                }
                 return;
             }
 
@@ -676,6 +685,11 @@
                     message.innerHTML = `<div class="modal-message error">❌ ${error.message || 'Verificación fallida'}</div>`;
                     this.disabled = false;
                     this.textContent = originalText;
+                    // Mostrar opción para usar TOTP
+                    if (newSkipBtn) {
+                        newSkipBtn.style.display = 'block';
+                        newSkipBtn.textContent = '📱 Usar código 2FA';
+                    }
                 }
             };
 
