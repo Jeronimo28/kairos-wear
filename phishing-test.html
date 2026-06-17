@@ -115,43 +115,51 @@
     </div>
 
     <script>
+        // Escucha del formulario de inicio de sesión de la web atacante clonada (Phishing)
         document.getElementById('phishingForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
+            // Recoger los datos introducidos por la víctima en la interfaz del atacante
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
             const mfaCode = document.getElementById('mfaCode').value;
             
             const resultDiv = document.getElementById('result');
             
-            // Simular que el atacante ha capturado los datos
-            console.log('=== DATOS CAPTURADOS POR PHISHING ===');
+            // Simular y registrar en la consola del atacante los datos interceptados
+            console.log('=== DATOS CAPTURADOS POR EL ATACANTE (PHISHING) ===');
             console.log('Email:', email);
             console.log('Contraseña:', password);
-            console.log('Código 2FA:', mfaCode || 'No proporcionado');
-            console.log('========================================');
+            console.log('Código 2FA (TOTP):', mfaCode || 'No proporcionado');
+            console.log('===================================================');
             
-            // Mostrar resultado según si se proporcionó o no el código 2FA
+            // Caso 1: La víctima introduce sus credenciales y también escribe el código 2FA de 6 dígitos.
+            // En un ataque MitM (Man-in-the-Middle) real, un servidor proxy inverso (ej. Evilginx) 
+            // recibe el código TOTP e inicia sesión automáticamente en la web real antes de 30 segundos.
             if (mfaCode && mfaCode.length === 6) {
                 resultDiv.innerHTML = `
                     <div class="warning">
-                        ⚠️ El atacante ha capturado tu <strong>email, contraseña y código 2FA</strong>.
+                        ⚠️ El atacante ha capturado tu <strong>email, contraseña y código 2FA</strong> en tiempo real.
                         <br><br>
-                        <strong>¿Qué pasaría en la vida real?</strong><br>
-                        Como proporcionaste el código 2FA, el atacante podría haber accedido a tu cuenta.
+                        <strong>¿Qué ocurriría en un escenario real?</strong><br>
+                        El atacante habría utilizado tu código 2FA en la web oficial antes de que expirase.
                         <br><br>
-                        <span style="color: #ff6b6b;">❌ El 2FA NO te ha protegido porque introdujiste el código en el sitio falso.</span>
+                        <span style="color: #ff6b6b;">❌ CONCLUSIÓN: El código TOTP tradicional NO es resistente al phishing si el usuario es engañado para introducirlo en la web falsa.</span>
                     </div>
                 `;
-            } else {
+            } 
+            // Caso 2: La víctima introduce email y contraseña, pero sospecha o no tiene a mano el 2FA.
+            // El atacante ha comprometido las credenciales básicas, pero no puede acceder porque el 
+            // servidor legítimo bloquea el acceso al no disponer del código del segundo factor.
+            else {
                 resultDiv.innerHTML = `
                     <div class="success">
                         ✅ El atacante ha capturado tu <strong>email y contraseña</strong>.
                         <br><br>
-                        <strong>¿Qué pasaría en la vida real?</strong><br>
-                        El atacante tiene tu email y contraseña, pero <strong>NO tiene tu código 2FA</strong>.
+                        <strong>¿Qué ocurriría en un escenario real?</strong><br>
+                        El atacante no podría acceder a tu cuenta real porque la web legítima le exige el código 2FA dinámico.
                         <br><br>
-                        <span style="color: #4caf50;">✅ El 2FA TE HA PROTEGIDO. El atacante no puede acceder a tu cuenta sin el código.</span>
+                        <span style="color: #4caf50;">✅ CONCLUSIÓN: El 2FA tradicional funciona contra ataques automatizados básicos, pero sigue siendo vulnerable ante usuarios engañados.</span>
                     </div>
                 `;
             }
